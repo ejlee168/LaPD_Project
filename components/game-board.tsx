@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -13,6 +13,7 @@ import Link from "next/link";
 import type { Game, Diagnosis } from "@/lib/types";
 import { getHaptics } from "@/lib/haptics";
 import { saveAttempt } from "@/lib/attempts";
+import { FadeIn } from "./fade-in";
 
 interface GameBoardProps {
   game: Game;
@@ -36,7 +37,6 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   const [guessHistory, setGuessHistory] = useState<GuessEntry[]>([]);
 
   const totalClues = game.clues.length;
-  const guessesRemaining = totalClues - revealedCount;
   const disabledIds = new Set(guessHistory.filter((g) => g.diagnosisId).map((g) => g.diagnosisId!));
 
   const allRevealed = revealedCount >= totalClues;
@@ -80,6 +80,23 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   function revealNextClue() {
     setRevealedCount((prev) => Math.min(prev + 1, totalClues));
   }
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || gameState !== "playing") return;
+      // Don't double-fire when the combobox input already handles Enter
+      if ((e.target as HTMLElement)?.tagName === "INPUT") return;
+      e.preventDefault();
+      handleGuess();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedDiagnosis, gameState, allRevealed],
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <div className="space-y-6">
@@ -167,14 +184,16 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           {guessHistory.length > 0 && (
             <div className="space-y-1">
               {guessHistory.map((entry, i) => (
-                <p key={i} className="text-sm text-muted-foreground">
-                  <span className="ml-2 opacity-60">Clue {entry.clueNumber}: </span>
-                  {entry.type === "wrong" ? (
-                    <span className="text-destructive">{entry.name}</span>
-                  ) : (
-                    <span className="italic">Skipped</span>
-                  )}
-                </p>
+                <FadeIn key={i}>
+                  <p className="text-sm text-muted-foreground">
+                    <span className="ml-2 opacity-60">Clue {entry.clueNumber}: </span>
+                    {entry.type === "wrong" ? (
+                      <span className="text-destructive">{entry.name}</span>
+                    ) : (
+                      <span className="italic">Skipped</span>
+                    )}
+                  </p>
+                </FadeIn>
               ))}
             </div>
           )}
@@ -217,6 +236,6 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           />
         </div>
       )}
-    </div>
+    </div >
   );
 }
