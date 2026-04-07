@@ -179,7 +179,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
       {gameState === "playing" && (
         <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col-reverse sm:flex-row gap-2">
             <div className="flex-1">
               <DiagnosisCombobox
                 diagnoses={diagnoses}

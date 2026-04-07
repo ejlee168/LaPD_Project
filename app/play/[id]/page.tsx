@@ -21,7 +21,7 @@ function GameBoardSkeleton() {
         ))}
       </div>
       <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col-reverse sm:flex-row gap-2">
           <div className="flex-1">
             <Skeleton className="h-8 w-full rounded-lg" />
           </div>
