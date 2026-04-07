@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { EditorForm } from "@/components/editor-form";
 import { getDiagnoses } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FadeIn } from "@/components/fade-in";
 
 function EditorFormSkeleton() {
   return (
@@ -42,10 +43,10 @@ async function EditorFormLoader() {
 export default function EditorPage() {
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-2">
+      <FadeIn className="text-center space-y-2">
         <h1 className="text-2xl font-bold">Create New Case</h1>
         <p className="text-muted-foreground">Add a clinical case for the community</p>
-      </div>
+      </FadeIn>
       <Suspense fallback={<EditorFormSkeleton />}>
         <EditorFormLoader />
       </Suspense>

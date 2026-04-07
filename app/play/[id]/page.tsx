@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { GameBoard } from "@/components/game-board";
 import { getDiagnoses } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FadeIn } from "@/components/fade-in";
 import type { Game } from "@/lib/types";
 
 function GameBoardSkeleton() {
@@ -15,7 +16,7 @@ function GameBoardSkeleton() {
         </div>
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="rounded-lg border border-muted bg-muted/30 p-4">
-            <Skeleton className="mx-auto h-6 w-16 bg-muted-foreground/10" />
+            <p className="text-base text-center select-none text-muted-foreground">...</p>
           </div>
         ))}
       </div>
@@ -77,9 +78,9 @@ export default async function PlayPage({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center space-y-1">
+      <FadeIn className="text-center space-y-1">
         <h1 className="text-2xl font-bold">What&apos;s the diagnosis?</h1>
-      </div>
+      </FadeIn>
       <Suspense fallback={<GameBoardSkeleton />}>
         <GameLoader id={id} />
       </Suspense>

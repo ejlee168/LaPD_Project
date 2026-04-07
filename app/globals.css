@@ -132,3 +132,27 @@
     overscroll-behavior: none;
   }
 }
+
+@layer components {
+  /* Subtle hover lift and press for buttons */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    @apply transition-all duration-150;
+  }
+  button:not(:disabled):active,
+  [role="button"]:not(:disabled):active {
+    @apply scale-[0.97];
+  }
+
+  /* Smooth underline for nav links */
+  nav a {
+    @apply relative;
+  }
+  nav a::after {
+    content: "";
+    @apply absolute bottom-0 left-0 h-px w-0 bg-foreground transition-all duration-200;
+  }
+  nav a:hover::after {
+    @apply w-full;
+  }
+}

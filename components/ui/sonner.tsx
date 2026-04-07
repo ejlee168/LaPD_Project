@@ -11,6 +11,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      richColors
+      position="top-center"
+      swipeDirections={["right", "left", "top"]}
+      visibleToasts={1}
+      closeButton
       icons={{
         success: (
           <FaCircleCheck className="size-4" />
@@ -38,7 +43,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          toast: "cn-toast cursor-pointer",
         },
       }}
       {...props}

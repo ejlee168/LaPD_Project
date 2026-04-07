@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FadeIn } from "@/components/fade-in";
 import { FaDownload } from "react-icons/fa6";
 import type { AnkiPack } from "@/lib/types";
 
@@ -61,10 +62,10 @@ async function PackList() {
 export default function AnkiPage() {
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-2">
+      <FadeIn className="text-center space-y-2">
         <h1 className="text-2xl font-bold">Anki Packs</h1>
         <p className="text-muted-foreground">Download flashcard decks for study</p>
-      </div>
+      </FadeIn>
       <Suspense fallback={<PackListSkeleton />}>
         <PackList />
       </Suspense>
