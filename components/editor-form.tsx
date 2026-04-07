@@ -16,7 +16,6 @@ interface EditorFormProps {
 }
 
 interface ClueInput {
-  label: string;
   text: string;
   imageFile: File | null;
   imagePreview: string | null;
@@ -28,13 +27,13 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
   const [author, setAuthor] = useState("");
   const [answerId, setAnswerId] = useState("");
   const [clues, setClues] = useState<ClueInput[]>(
-    Array.from({ length: 6 }, () => ({ label: "", text: "", imageFile: null, imagePreview: null }))
+    Array.from({ length: 6 }, () => ({ text: "", imageFile: null, imagePreview: null }))
   );
   const [submitting, setSubmitting] = useState(false);
 
-  function updateClue(index: number, field: "label" | "text", value: string) {
+  function updateClue(index: number, value: string) {
     setClues((prev) =>
-      prev.map((clue, i) => (i === index ? { ...clue, [field]: value } : clue))
+      prev.map((clue, i) => (i === index ? { ...clue, text: value } : clue))
     );
   }
 
@@ -70,7 +69,6 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
       const formattedClues = await Promise.all(
         clues.map(async (c) => {
           const clue: Record<string, string> = { text: c.text.trim() };
-          if (c.label.trim()) clue.label = c.label.trim();
           if (c.imageFile) clue.imageUrl = await uploadImage(supabase, c.imageFile);
           return clue;
         })
@@ -108,13 +106,10 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
         <DiagnosisCombobox diagnoses={diagnoses} value={answerId} onSelect={setAnswerId} placeholder="Select the answer..." />
       </div>
       <div className="space-y-3">
-        <label className="text-sm font-medium">Clues <span className="text-muted-foreground font-normal">(labels optional)</span></label>
+        <label className="text-sm font-medium">Clues</label>
         {clues.map((clue, index) => (
           <div key={index} className="space-y-2 rounded-lg border p-3">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input className="sm:w-32" placeholder="Label" value={clue.label} onChange={(e) => updateClue(index, "label", e.target.value)} />
-              <Input className="flex-1" placeholder={`Clue ${index + 1} text...`} value={clue.text} onChange={(e) => updateClue(index, "text", e.target.value)} />
-            </div>
+            <Input placeholder={`Clue ${index + 1} text...`} value={clue.text} onChange={(e) => updateClue(index, e.target.value)} />
             {clue.imagePreview ? (
               <div className="relative inline-block">
                 <Image

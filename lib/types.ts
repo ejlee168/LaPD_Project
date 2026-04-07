@@ -4,7 +4,6 @@ export interface Diagnosis {
 }
 
 export interface Clue {
-  label?: string;
   text: string;
   imageUrl?: string;
 }

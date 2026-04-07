@@ -113,14 +113,13 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           >
             {index < revealedCount ? (
               <>
-                {clue.label && <p className="text-xs text-muted-foreground mb-1">{clue.label}</p>}
                 <p className="text-base text-center">{clue.text}</p>
                 {clue.imageUrl && (
                   <div className="mt-2 flex justify-center">
                     <button type="button" onClick={() => setLightboxSrc(clue.imageUrl!)} className="cursor-zoom-in">
                       <Image
                         src={clue.imageUrl}
-                        alt={clue.label ?? `Clue ${index + 1}`}
+                        alt={`Clue ${index + 1}`}
                         width={400}
                         height={200}
                         className="h-48 w-auto rounded-md border object-contain"
