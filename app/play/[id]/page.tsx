@@ -11,18 +11,24 @@ function GameBoardSkeleton() {
     <div className="space-y-6">
       <div className="space-y-3">
         <div className="rounded-lg border p-4">
-          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-6 w-full" />
         </div>
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="rounded-lg border border-muted bg-muted/30 p-4">
-            <Skeleton className="h-5 w-16 bg-muted-foreground/10" />
+            <Skeleton className="mx-auto h-6 w-16 bg-muted-foreground/10" />
           </div>
         ))}
       </div>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Skeleton className="h-8 flex-1 rounded-lg" />
-        <Skeleton className="h-8 w-20 rounded-lg" />
-        <Skeleton className="h-8 w-16 rounded-lg" />
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex-1">
+            <Skeleton className="h-8 w-full rounded-lg" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-8 flex-1 sm:flex-initial sm:w-[52px] rounded-lg" />
+            <Skeleton className="h-8 flex-1 sm:flex-initial sm:w-[42px] rounded-lg" />
+          </div>
+        </div>
       </div>
     </div>
   );
