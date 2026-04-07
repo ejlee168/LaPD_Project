@@ -75,7 +75,7 @@ export default async function HomePage({
         <p>or</p>
         <div className="text-center">
           <Link href="/editor">
-            <Button>+ Create a Case</Button>
+            <Button className="py-4">+ Create a Case</Button>
           </Link>
         </div>
       </div>
