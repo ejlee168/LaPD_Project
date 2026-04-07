@@ -76,7 +76,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center space-y-1">
-        <h1 className="text-2xl font-bold">{game.title}</h1>
+        <h1 className="text-2xl font-bold">What's the diagnosis?</h1>
       </div>
 
       <div className="space-y-3">
@@ -116,13 +116,29 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
       </div>
 
       {gameState !== "playing" && !dialogOpen && (
-        <div className="rounded-lg border bg-muted/50 p-3 text-center text-base">
-          <span className={gameState === "won" ? "text-green-500 font-semibold" : "text-red-700 font-semibold"}>
-            {gameState === "won" ? "Correct!" : `Answer: ${answerName}`}
-          </span>
-          <Link href="/" className="ml-3 underline underline-offset-2 text-muted-foreground hover:text-foreground">
-            Back to Levels
-          </Link>
+        <div className="space-y-3">
+          <div className="rounded-lg border bg-muted/50 p-3 text-center text-base">
+            <span className={gameState === "won" ? "text-green-500 font-semibold" : "text-red-700 font-semibold"}>
+              {gameState === "won" ? "Correct!" : `Answer: ${answerName}`}
+            </span>
+            <Link href="/" className="ml-3 underline underline-offset-2 text-muted-foreground hover:text-foreground">
+              Back to Levels
+            </Link>
+          </div>
+          {guessHistory.length > 0 && (
+            <div className="space-y-1">
+              {guessHistory.map((entry, i) => (
+                <p key={i} className="text-sm text-muted-foreground">
+                  <span className="ml-2 opacity-60">Clue {entry.clueNumber}: </span>
+                  {entry.type === "wrong" ? (
+                    <span className="text-destructive">{entry.name}</span>
+                  ) : (
+                    <span className="italic">Skipped</span>
+                  )}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -148,12 +164,12 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
             <div className="space-y-1">
               {guessHistory.map((entry, i) => (
                 <p key={i} className="text-sm text-muted-foreground">
+                  <span className="ml-2 opacity-60">Clue {entry.clueNumber}: </span>
                   {entry.type === "wrong" ? (
                     <span className="text-destructive">{entry.name}</span>
                   ) : (
                     <span className="italic">Skipped</span>
                   )}
-                  <span className="ml-2 opacity-60">— Clue {entry.clueNumber}</span>
                 </p>
               ))}
             </div>
@@ -161,30 +177,17 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
         </div>
       )}
 
-      <Dialog open={gameState === "won" && dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
+      <Dialog open={gameState !== "playing" && dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
         <DialogContent className="text-center">
           <DialogHeader>
-            <DialogTitle className="text-2xl">Correct!</DialogTitle>
+            <DialogTitle className="text-2xl">{gameState === "won" ? "Correct!" : "Game Over"}</DialogTitle>
             <DialogDescription render={<div />}>
-              <span className="block text-base font-semibold text-green-500">{answerName}</span>
-              <span className="block text-muted-foreground">Solved with {revealedCount} clue{revealedCount !== 1 ? "s" : ""}</span>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-2">
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Admire Puzzle</Button>
-            <Link href="/">
-              <Button className="w-full">Back to Levels</Button>
-            </Link>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={gameState === "lost" && dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
-        <DialogContent className="text-center">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">Game Over</DialogTitle>
-            <DialogDescription render={<div />}>
-              <span className="block text-base font-semibold text-red-700">Answer: {answerName}</span>
+              <span className={cn("block text-base font-semibold", gameState === "won" ? "text-green-500" : "text-red-700")}>
+                {gameState === "won" ? answerName : `Answer: ${answerName}`}
+              </span>
+              {gameState === "won" && (
+                <span className="block text-muted-foreground">Solved with {revealedCount} clue{revealedCount !== 1 ? "s" : ""}</span>
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2">

@@ -15,7 +15,7 @@ export default async function HomePage({
 
   let query = supabase
     .from("games")
-    .select("id, title, clues, created_at")
+    .select("id, title, author, clues, created_at")
     .order("created_at", { ascending: false });
 
   if (q) {
@@ -27,7 +27,7 @@ export default async function HomePage({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">LaPD</h1>
+        <h1 className="text-2xl font-bold">LaPD Project</h1>
         <p className="text-muted-foreground">Guess the diagnosis from clinical clues</p>
       </div>
       <form className="max-w-md mx-auto">
@@ -39,7 +39,9 @@ export default async function HomePage({
             <Card className="hover:border-foreground/20 transition-colors cursor-pointer">
               <CardHeader>
                 <CardTitle className="text-base">{game.title}</CardTitle>
-                <CardDescription>{game.clues.length} clues</CardDescription>
+                <CardDescription>
+                  {new Date(game.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} {game.author && `| ${game.author}`}
+                  </CardDescription>
               </CardHeader>
             </Card>
           </Link>

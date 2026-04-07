@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { Diagnosis } from "@/lib/types";
@@ -24,11 +24,12 @@ export function DiagnosisCombobox({
   const inputRef = useRef<HTMLInputElement>(null);
   const userEditingRef = useRef(false);
 
-  const filtered = query.trim()
-    ? diagnoses.filter((d) =>
-        d.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : diagnoses;
+  const filtered = useMemo(() => {
+    if (!open && !query.trim()) return [];
+    return query.trim()
+      ? diagnoses.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()))
+      : diagnoses;
+  }, [open, query, diagnoses]);
 
   function handleSelect(diagnosis: Diagnosis) {
     userEditingRef.current = false;
