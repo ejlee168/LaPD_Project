@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Game, Diagnosis } from "@/lib/types";
 import { getHaptics } from "@/lib/haptics";
+import { saveAttempt } from "@/lib/attempts";
 
 interface GameBoardProps {
   game: Game;
@@ -47,6 +48,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
     }
     if (selectedDiagnosis === game.answer_id) {
       getHaptics().trigger("success");
+      saveAttempt(game.id, "won", revealedCount);
       setGameState("won");
       return;
     }
@@ -56,6 +58,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
     toast.error("Wrong diagnosis!");
     setSelectedDiagnosis("");
     if (allRevealed) {
+      saveAttempt(game.id, "lost", totalClues);
       setGameState("lost");
     } else {
       revealNextClue();
@@ -67,6 +70,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
     setGuessHistory((prev) => [...prev, { type: "skip", clueNumber: revealedCount }]);
     setSelectedDiagnosis("");
     if (allRevealed) {
+      saveAttempt(game.id, "lost", totalClues);
       setGameState("lost");
     } else {
       revealNextClue();

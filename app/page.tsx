@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CaseCard } from "@/components/case-card";
 
 function CaseGridSkeleton() {
   return (
@@ -37,16 +37,13 @@ async function CaseGrid({ q }: { q?: string }) {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {games?.map((game) => (
-          <Link key={game.id} href={`/play/${game.id}`}>
-            <Card className="hover:border-foreground/20 transition-colors cursor-pointer">
-              <CardHeader>
-                <CardTitle className="text-base">{game.title}</CardTitle>
-                <CardDescription>
-                  {new Date(game.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} {game.author && `| ${game.author}`}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
+          <CaseCard
+            key={game.id}
+            id={game.id}
+            title={game.title}
+            author={game.author}
+            createdAt={game.created_at}
+          />
         ))}
       </div>
       {games?.length === 0 && (
