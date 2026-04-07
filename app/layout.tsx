@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { NavHeader } from "@/components/nav-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer"
+import { SoundProvider } from "@/components/sound-provider"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,12 +31,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
-          <div className="flex min-h-screen flex-col">
-            <NavHeader />
-            <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
+          <SoundProvider>
+            <div className="flex min-h-screen flex-col">
+              <NavHeader />
+              <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
+              <Footer />
+            </div>
+            <Toaster />
+          </SoundProvider>
         </ThemeProvider>
       </body>
     </html>

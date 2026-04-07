@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShuffleButton } from "@/components/shuffle-button";
+import { SoundToggle } from "@/components/sound-toggle";
 
 export function NavHeader() {
   return (
@@ -13,9 +14,10 @@ export function NavHeader() {
           <ShuffleButton />
         </div>
         <nav className="flex items-center gap-3 sm:gap-5">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">cases</Link>
-          <Link href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
+          <Link data-no-click-sound href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">cases</Link>
+          <Link data-no-click-sound href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
           {/* <Link href="/editor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">create</Link> */}
+          <SoundToggle />
           <div className="-translate-x-2">
             <ThemeToggle />
           </div>

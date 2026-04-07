@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { DiagnosisCombobox } from "@/components/diagnosis-combobox";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useSoundEnabled } from "@/components/sound-provider";
 import type { Diagnosis } from "@/lib/types";
 import { FaXmark } from "react-icons/fa6";
 
@@ -23,6 +24,7 @@ interface ClueInput {
 
 export function EditorForm({ diagnoses }: EditorFormProps) {
   const router = useRouter();
+  const { play } = useSoundEnabled();
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [answerId, setAnswerId] = useState("");
@@ -59,9 +61,10 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim()) { toast.error("Title is required", { duration: 1500 }); return; }
-    if (!answerId) { toast.error("Select a correct diagnosis", { duration: 1500 }); return; }
-    if (clues.some((c) => !c.text.trim())) { toast.error("All 6 clue texts are required", { duration: 1500 }); return; }
+    if (!title.trim()) { play("error"); toast.error("Title is required", { duration: 1500 }); return; }
+    if (!answerId) { play("error"); toast.error("Select a correct diagnosis", { duration: 1500 }); return; }
+    if (clues.some((c) => !c.text.trim())) { play("error"); toast.error("All 6 clue texts are required", { duration: 1500 }); return; }
+    play("click");
 
     setSubmitting(true);
     const supabase = createClient();
@@ -81,11 +84,11 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
         clues: formattedClues,
       });
 
-      if (error) { toast.error("Failed to create case", { duration: 1500 }); return; }
+      if (error) { play("error"); toast.error("Failed to create case", { duration: 1500 }); return; }
       toast.success("Case created!", { duration: 1500 });
       router.push("/");
     } catch {
-      toast.error("Failed to upload image", { duration: 1500 });
+      play("error"); toast.error("Failed to upload image", { duration: 1500 });
     } finally {
       setSubmitting(false);
     }
@@ -141,7 +144,7 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
           </div>
         ))}
       </div>
-      <Button type="submit" disabled={submitting} className="w-full">
+      <Button data-no-click-sound type="submit" disabled={submitting} className="w-full">
         {submitting ? "Submitting..." : "Submit Case"}
       </Button>
     </form>

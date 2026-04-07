@@ -13,6 +13,7 @@ import Link from "next/link";
 import type { Game, Diagnosis } from "@/lib/types";
 import { getHaptics } from "@/lib/haptics";
 import { saveAttempt } from "@/lib/attempts";
+import { useSoundEnabled } from "@/components/sound-provider";
 import { FadeIn } from "./fade-in";
 
 interface GameBoardProps {
@@ -36,6 +37,8 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [guessHistory, setGuessHistory] = useState<GuessEntry[]>([]);
 
+  const { play } = useSoundEnabled();
+
   const totalClues = game.clues.length;
   const disabledIds = new Set(guessHistory.filter((g) => g.diagnosisId).map((g) => g.diagnosisId!));
 
@@ -43,10 +46,12 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
   function handleGuess() {
     if (!selectedDiagnosis) {
+      play("error");
       toast.error("Select a diagnosis first", { duration: 1500 });
       return;
     }
     if (selectedDiagnosis === game.answer_id) {
+      play("click");
       getHaptics().trigger("success");
       saveAttempt(game.id, "won", revealedCount);
       setGameState("won");
@@ -54,6 +59,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
     }
     const name = diagnoses.find((d) => d.id === selectedDiagnosis)?.name ?? "";
     setGuessHistory((prev) => [...prev, { type: "wrong", diagnosisId: selectedDiagnosis, name, clueNumber: revealedCount }]);
+    play("wrong");
     getHaptics().trigger("error");
     toast.error("Wrong diagnosis!", { duration: 1500 });
     setSelectedDiagnosis("");
@@ -66,6 +72,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   }
 
   function handleSkip() {
+    play("skip");
     getHaptics().trigger("light");
     setGuessHistory((prev) => [...prev, { type: "skip", clueNumber: revealedCount }]);
     setSelectedDiagnosis("");
@@ -175,8 +182,8 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleGuess} className="flex-1 sm:flex-initial">Guess</Button>
-              <Button variant="outline" onClick={handleSkip} className="flex-1 sm:flex-initial">Skip</Button>
+              <Button data-no-click-sound onClick={handleGuess} className="flex-1 sm:flex-initial">Guess</Button>
+              <Button data-no-click-sound variant="outline" onClick={handleSkip} className="flex-1 sm:flex-initial">Skip</Button>
             </div>
           </div>
 
