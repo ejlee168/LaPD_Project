@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { LuShuffle } from "react-icons/lu";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,17 @@ import { toast } from "sonner";
 
 export function ShuffleButton() {
   const router = useRouter();
+  const pathname = usePathname();
 
   async function handleShuffle() {
     const promise = async () => {
       const supabase = createClient();
       const { data } = await supabase.from("games").select("id");
       if (!data || data.length === 0) throw new Error("No cases found");
-      const random = data[Math.floor(Math.random() * data.length)];
+      const currentId = pathname.startsWith("/play/") ? pathname.split("/")[2] : null;
+      const candidates = currentId ? data.filter((g) => g.id !== currentId) : data;
+      if (candidates.length === 0) throw new Error("No other cases available");
+      const random = candidates[Math.floor(Math.random() * candidates.length)];
       router.push(`/play/${random.id}`);
     };
 
