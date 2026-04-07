@@ -123,7 +123,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
         <div className="space-y-3">
           <div className="rounded-lg border bg-muted/50 p-3 text-center text-base">
             <span className={gameState === "won" ? "text-green-500 font-semibold" : "text-red-700 font-semibold"}>
-              {gameState === "won" ? "Correct!" : `Answer: ${answerName}`}
+              {gameState === "won" ? `Correct! ${answerName}` : `Answer: ${answerName}`}
             </span>
             <Link href="/" className="ml-3 underline underline-offset-2 text-muted-foreground hover:text-foreground">
               Back to Levels
@@ -181,7 +181,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
         </div>
       )}
 
-      <Dialog open={gameState !== "playing" && dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
+      <Dialog open={gameState !== "playing" && dialogOpen} onOpenChange={(open) => { if (!open) setRevealedCount(totalClues); setDialogOpen(open); }}>
         <DialogContent className="text-center">
           <DialogHeader>
             <DialogTitle className="text-xl">{gameState === "won" ? "Correct!" : "Game Over"}</DialogTitle>
@@ -195,7 +195,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2">
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Admire Puzzle</Button>
+            <Button variant="outline" onClick={() => { setRevealedCount(totalClues); setDialogOpen(false); }}>Admire Puzzle</Button>
             <Link href="/">
               <Button className="w-full">Back to Levels</Button>
             </Link>
