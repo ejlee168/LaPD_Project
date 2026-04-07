@@ -6,6 +6,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import { DiagnosisCombobox } from "@/components/diagnosis-combobox";
+import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -53,6 +54,13 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
     if (selectedDiagnosis === game.answer_id) {
       play("click");
       getHaptics().trigger("success");
+      confetti({
+        particleCount: 100,
+        spread: 100,
+        origin: { y: 1, x: 0.5 },
+        gravity: 1,
+        startVelocity: 45,
+      });
       saveAttempt(game.id, "won", revealedCount);
       setGameState("won");
       return;
