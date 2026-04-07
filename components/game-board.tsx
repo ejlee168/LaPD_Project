@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import type { Game, Diagnosis } from "@/lib/types";
+import { getHaptics } from "@/lib/haptics";
 
 interface GameBoardProps {
   game: Game;
@@ -45,11 +46,13 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
       return;
     }
     if (selectedDiagnosis === game.answer_id) {
+      getHaptics().trigger("success");
       setGameState("won");
       return;
     }
     const name = diagnoses.find((d) => d.id === selectedDiagnosis)?.name ?? "";
     setGuessHistory((prev) => [...prev, { type: "wrong", diagnosisId: selectedDiagnosis, name, clueNumber: revealedCount }]);
+    getHaptics().trigger("error");
     toast.error("Wrong diagnosis!");
     setSelectedDiagnosis("");
     if (allRevealed) {
@@ -60,6 +63,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   }
 
   function handleSkip() {
+    getHaptics().trigger("light");
     setGuessHistory((prev) => [...prev, { type: "skip", clueNumber: revealedCount }]);
     setSelectedDiagnosis("");
     if (allRevealed) {
@@ -74,11 +78,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center space-y-1">
-        <h1 className="text-2xl font-bold">What's the diagnosis?</h1>
-      </div>
-
+    <div className="space-y-6">
       <div className="space-y-3">
         {game.clues.map((clue, index) => (
           <div
@@ -180,7 +180,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
       <Dialog open={gameState !== "playing" && dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
         <DialogContent className="text-center">
           <DialogHeader>
-            <DialogTitle className="text-2xl">{gameState === "won" ? "Correct!" : "Game Over"}</DialogTitle>
+            <DialogTitle className="text-xl">{gameState === "won" ? "Correct!" : "Game Over"}</DialogTitle>
             <DialogDescription render={<div />}>
               <span className={cn("block text-base font-semibold", gameState === "won" ? "text-green-500" : "text-red-700")}>
                 {gameState === "won" ? answerName : `Answer: ${answerName}`}

@@ -1,6 +1,6 @@
 "use client"
 
-import { FaSun, FaMoon } from "react-icons/fa6"
+import { LuSun, LuMoon } from "react-icons/lu"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
@@ -17,8 +17,8 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger render={<Button variant="outline" size="icon" />}>
-        <FaSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-        <FaMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        <LuSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+        <LuMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
         <span className="sr-only">Toggle theme</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
