@@ -33,7 +33,7 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <NavHeader />
             <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
-            <Footer/>
+            <Footer />
           </div>
           <Toaster />
         </ThemeProvider>
