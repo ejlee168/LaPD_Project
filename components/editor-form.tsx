@@ -25,6 +25,7 @@ interface ClueInput {
 export function EditorForm({ diagnoses }: EditorFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [answerId, setAnswerId] = useState("");
   const [clues, setClues] = useState<ClueInput[]>(
     Array.from({ length: 6 }, () => ({ label: "", text: "", imageFile: null, imagePreview: null }))
@@ -48,12 +49,7 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
     );
   }
 
-  function removeImage(index: number) {
-    handleImageSelect(index, null);
-  }
-
-  async function uploadImage(file: File): Promise<string> {
-    const supabase = createClient();
+  async function uploadImage(supabase: ReturnType<typeof createClient>, file: File): Promise<string> {
     const ext = file.name.split(".").pop();
     const path = `${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("clue-images").upload(path, file);
@@ -69,19 +65,20 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
     if (clues.some((c) => !c.text.trim())) { toast.error("All 6 clue texts are required"); return; }
 
     setSubmitting(true);
+    const supabase = createClient();
     try {
       const formattedClues = await Promise.all(
         clues.map(async (c) => {
           const clue: Record<string, string> = { text: c.text.trim() };
           if (c.label.trim()) clue.label = c.label.trim();
-          if (c.imageFile) clue.imageUrl = await uploadImage(c.imageFile);
+          if (c.imageFile) clue.imageUrl = await uploadImage(supabase, c.imageFile);
           return clue;
         })
       );
 
-      const supabase = createClient();
       const { error } = await supabase.from("games").insert({
         title: title.trim(),
+        ...(author.trim() ? { author: author.trim() } : {}),
         answer_id: answerId,
         clues: formattedClues,
       });
@@ -101,6 +98,10 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
       <div className="space-y-2">
         <label className="text-sm font-medium">Title</label>
         <Input placeholder='e.g. "Case #5: Headache"' value={title} onChange={(e) => setTitle(e.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Author <span className="text-muted-foreground font-normal">(optional)</span></label>
+        <Input placeholder="Your name" value={author} onChange={(e) => setAuthor(e.target.value)} />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Correct Diagnosis</label>
@@ -125,7 +126,7 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
                 />
                 <button
                   type="button"
-                  onClick={() => removeImage(index)}
+                  onClick={() => handleImageSelect(index, null)}
                   className="absolute -top-2 -right-2 rounded-full bg-destructive p-1 text-destructive-foreground shadow-sm hover:bg-destructive/90"
                 >
                   <FaXmark className="h-3 w-3" />

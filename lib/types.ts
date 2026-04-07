@@ -12,6 +12,7 @@ export interface Clue {
 export interface Game {
   id: string;
   title: string;
+  author?: string;
   answer_id: string;
   clues: Clue[];
   created_at: string;
