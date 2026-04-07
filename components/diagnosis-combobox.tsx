@@ -21,7 +21,6 @@ export function DiagnosisCombobox({
   const [query, setQuery] = useState(selectedName);
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const userEditingRef = useRef(false);
 
   const filtered = useMemo(() => {
@@ -36,7 +35,6 @@ export function DiagnosisCombobox({
     onSelect(diagnosis.id);
     setQuery(diagnosis.name);
     setOpen(false);
-    inputRef.current?.focus();
   }
 
   // Sync query when value changes externally (e.g. cleared after guess/skip)
@@ -74,7 +72,6 @@ export function DiagnosisCombobox({
   return (
     <div ref={wrapperRef} className="relative">
       <Input
-        ref={inputRef}
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
         onFocus={() => setOpen(true)}
