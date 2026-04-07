@@ -22,7 +22,7 @@ export default async function AnkiPage() {
           const { data: urlData } = supabase.storage.from("anki-packs").getPublicUrl(pack.file_path);
           return (
             <Card key={pack.id}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="space-y-1">
                   <CardTitle className="text-base">{pack.name}</CardTitle>
                   <CardDescription>{pack.description}</CardDescription>

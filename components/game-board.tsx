@@ -128,7 +128,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
       {gameState === "playing" && (
         <div className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <DiagnosisCombobox
                 diagnoses={diagnoses}
@@ -138,8 +138,10 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
                 disabledIds={disabledIds}
               />
             </div>
-            <Button onClick={handleGuess}>Guess</Button>
-            <Button variant="outline" onClick={handleSkip}>Skip</Button>
+            <div className="flex gap-2">
+              <Button onClick={handleGuess} className="flex-1 sm:flex-initial">Guess</Button>
+              <Button variant="outline" onClick={handleSkip} className="flex-1 sm:flex-initial">Skip</Button>
+            </div>
           </div>
 
           {guessHistory.length > 0 && (

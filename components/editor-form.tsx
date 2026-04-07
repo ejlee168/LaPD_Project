@@ -110,8 +110,8 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
         <label className="text-sm font-medium">Clues (6 required)</label>
         {clues.map((clue, index) => (
           <div key={index} className="space-y-2 rounded-lg border p-3">
-            <div className="flex gap-2">
-              <Input className="w-32" placeholder="Label" value={clue.label} onChange={(e) => updateClue(index, "label", e.target.value)} />
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Input className="sm:w-32" placeholder="Label" value={clue.label} onChange={(e) => updateClue(index, "label", e.target.value)} />
               <Input className="flex-1" placeholder={`Clue ${index + 1} text...`} value={clue.text} onChange={(e) => updateClue(index, "text", e.target.value)} />
             </div>
             {clue.imagePreview ? (
