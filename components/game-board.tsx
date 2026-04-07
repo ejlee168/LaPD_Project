@@ -43,7 +43,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
   function handleGuess() {
     if (!selectedDiagnosis) {
-      toast.error("Select a diagnosis first");
+      toast.error("Select a diagnosis first", { duration: 1000 });
       return;
     }
     if (selectedDiagnosis === game.answer_id) {
@@ -55,7 +55,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
     const name = diagnoses.find((d) => d.id === selectedDiagnosis)?.name ?? "";
     setGuessHistory((prev) => [...prev, { type: "wrong", diagnosisId: selectedDiagnosis, name, clueNumber: revealedCount }]);
     getHaptics().trigger("error");
-    toast.error("Wrong diagnosis!");
+    toast.error("Wrong diagnosis!", { duration: 1000 });
     setSelectedDiagnosis("");
     if (allRevealed) {
       saveAttempt(game.id, "lost", totalClues);
