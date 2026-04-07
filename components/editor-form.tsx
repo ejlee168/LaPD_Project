@@ -59,9 +59,9 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim()) { toast.error("Title is required", { duration: 1000 }); return; }
-    if (!answerId) { toast.error("Select a correct diagnosis", { duration: 1000 }); return; }
-    if (clues.some((c) => !c.text.trim())) { toast.error("All 6 clue texts are required", { duration: 1000 }); return; }
+    if (!title.trim()) { toast.error("Title is required", { duration: 1500 }); return; }
+    if (!answerId) { toast.error("Select a correct diagnosis", { duration: 1500 }); return; }
+    if (clues.some((c) => !c.text.trim())) { toast.error("All 6 clue texts are required", { duration: 1500 }); return; }
 
     setSubmitting(true);
     const supabase = createClient();
@@ -81,11 +81,11 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
         clues: formattedClues,
       });
 
-      if (error) { toast.error("Failed to create case", { duration: 1000 }); return; }
-      toast.success("Case created!", { duration: 1000 });
+      if (error) { toast.error("Failed to create case", { duration: 1500 }); return; }
+      toast.success("Case created!", { duration: 1500 });
       router.push("/");
     } catch {
-      toast.error("Failed to upload image", { duration: 1000 });
+      toast.error("Failed to upload image", { duration: 1500 });
     } finally {
       setSubmitting(false);
     }

@@ -26,7 +26,7 @@ export function ShuffleButton() {
       loading: "Shuffling...",
       success: "Here's a random case!",
       error: "Failed to load cases",
-      duration: 1000,
+      duration: 1500,
     });
   }
 
