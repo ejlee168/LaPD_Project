@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { FaDownload } from "react-icons/fa6";
 import type { AnkiPack } from "@/lib/types";
 
 export default async function AnkiPage() {
@@ -29,7 +29,7 @@ export default async function AnkiPage() {
                 </div>
                 <a href={urlData.publicUrl} download>
                   <Button variant="outline" size="sm">
-                    <Download className="mr-2 h-4 w-4" />
+                    <FaDownload className="mr-2 h-4 w-4" />
                     Download
                   </Button>
                 </a>

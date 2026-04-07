@@ -9,7 +9,7 @@ import { DiagnosisCombobox } from "@/components/diagnosis-combobox";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import type { Diagnosis } from "@/lib/types";
-import { X } from "lucide-react";
+import { FaXmark } from "react-icons/fa6";
 
 interface EditorFormProps {
   diagnoses: Diagnosis[];
@@ -128,7 +128,7 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
                   onClick={() => removeImage(index)}
                   className="absolute -top-2 -right-2 rounded-full bg-destructive p-1 text-destructive-foreground shadow-sm hover:bg-destructive/90"
                 >
-                  <X className="h-3 w-3" />
+                  <FaXmark className="h-3 w-3" />
                 </button>
               </div>
             ) : (

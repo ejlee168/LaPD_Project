@@ -86,14 +86,14 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
             className={cn(
               "rounded-lg border p-4 transition-all",
               index < revealedCount
-                ? "border-l-4 bg-card"
+                ? "bg-card"
                 : "bg-muted/30 border-muted"
             )}
           >
             {index < revealedCount ? (
               <>
                 {clue.label && <p className="text-xs text-muted-foreground mb-1">{clue.label}</p>}
-                <p className="text-sm">{clue.text}</p>
+                <p className="text-base">{clue.text}</p>
                 {clue.imageUrl && (
                   <div className="mt-2 flex justify-center">
                     <button type="button" onClick={() => setLightboxSrc(clue.imageUrl!)} className="cursor-zoom-in">
@@ -109,14 +109,14 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
                 )}
               </>
             ) : (
-              <p className="text-sm text-muted-foreground">Clue {index + 1} — locked</p>
+              <p className="text-base text-center select-none text-muted-foreground">...</p>
             )}
           </div>
         ))}
       </div>
 
       {gameState !== "playing" && !dialogOpen && (
-        <div className="rounded-lg border bg-muted/50 p-3 text-center text-sm">
+        <div className="rounded-lg border bg-muted/50 p-3 text-center text-base">
           <span className={gameState === "won" ? "text-green-500 font-semibold" : "text-red-700 font-semibold"}>
             {gameState === "won" ? "Correct!" : `Answer: ${answerName}`}
           </span>
@@ -145,7 +145,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           {guessHistory.length > 0 && (
             <div className="space-y-1">
               {guessHistory.map((entry, i) => (
-                <p key={i} className="text-xs text-muted-foreground">
+                <p key={i} className="text-sm text-muted-foreground">
                   {entry.type === "wrong" ? (
                     <span className="text-destructive">{entry.name}</span>
                   ) : (
@@ -164,7 +164,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           <DialogHeader>
             <DialogTitle className="text-2xl">Correct!</DialogTitle>
             <DialogDescription render={<div />}>
-              <span className="block text-lg font-semibold text-green-500">{answerName}</span>
+              <span className="block text-base font-semibold text-green-500">{answerName}</span>
               <span className="block text-muted-foreground">Solved with {revealedCount} clue{revealedCount !== 1 ? "s" : ""}</span>
             </DialogDescription>
           </DialogHeader>
@@ -182,7 +182,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           <DialogHeader>
             <DialogTitle className="text-2xl">Game Over</DialogTitle>
             <DialogDescription render={<div />}>
-              <span className="block text-lg font-semibold text-red-700">Answer: {answerName}</span>
+              <span className="block text-base font-semibold text-red-700">Answer: {answerName}</span>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2">
