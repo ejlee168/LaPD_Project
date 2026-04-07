@@ -133,6 +133,12 @@
   }
 }
 
+@keyframes shimmer {
+  100% {
+    translate: 100% 0;
+  }
+}
+
 @layer components {
   /* Subtle hover lift and press for buttons */
   button:not(:disabled),
