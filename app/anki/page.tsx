@@ -64,7 +64,7 @@ export default function AnkiPage() {
     <div className="space-y-6">
       <FadeIn className="text-center space-y-2">
         <h1 className="text-2xl font-bold">Anki Packs</h1>
-        <p className="text-muted-foreground">Download flashcard decks for study</p>
+        <p className="text-muted-foreground">download flashcard decks for study</p>
       </FadeIn>
       <Suspense fallback={<PackListSkeleton />}>
         <PackList />
