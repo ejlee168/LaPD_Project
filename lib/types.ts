@@ -14,7 +14,6 @@ export interface Game {
   answer_id: string;
   clues: Clue[];
   created_at: string;
-  diagnoses?: Diagnosis; // joined
 }
 
 export interface AnkiPack {

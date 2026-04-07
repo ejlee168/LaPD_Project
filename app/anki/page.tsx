@@ -27,12 +27,12 @@ export default async function AnkiPage() {
                   <CardTitle className="text-base">{pack.name}</CardTitle>
                   <CardDescription>{pack.description}</CardDescription>
                 </div>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={urlData.publicUrl} download>
+                <a href={urlData.publicUrl} download>
+                  <Button variant="outline" size="sm">
                     <Download className="mr-2 h-4 w-4" />
                     Download
-                  </a>
-                </Button>
+                  </Button>
+                </a>
               </CardHeader>
             </Card>
           );

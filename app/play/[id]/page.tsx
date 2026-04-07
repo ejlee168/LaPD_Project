@@ -24,9 +24,22 @@ export default async function PlayPage({
     notFound();
   }
 
-  const game = gameResult.data as Game;
+  const data = gameResult.data;
   const diagnoses = (diagnosesResult.data ?? []) as Diagnosis[];
-  const answerName = (game.diagnoses as unknown as { name: string })?.name ?? "Unknown";
+
+  // Supabase returns the joined relation; extract the answer name
+  const joinedDiagnosis = data.diagnoses as unknown as { name: string } | { name: string }[] | null;
+  const answerName = Array.isArray(joinedDiagnosis)
+    ? joinedDiagnosis[0]?.name ?? "Unknown"
+    : joinedDiagnosis?.name ?? "Unknown";
+
+  const game: Game = {
+    id: data.id,
+    title: data.title,
+    answer_id: data.answer_id,
+    clues: data.clues,
+    created_at: data.created_at,
+  };
 
   return <GameBoard game={game} diagnoses={diagnoses} answerName={answerName} />;
 }

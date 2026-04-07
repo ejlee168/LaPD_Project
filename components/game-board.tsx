@@ -105,14 +105,16 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
         <DialogContent className="text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl">🎉 Correct!</DialogTitle>
-            <DialogDescription asChild>
+            <DialogDescription>
               <div className="space-y-2">
                 <p className="text-lg font-semibold text-green-500">{answerName}</p>
                 <p className="text-muted-foreground">Solved with {revealedCount} clue{revealedCount !== 1 ? "s" : ""}</p>
               </div>
             </DialogDescription>
           </DialogHeader>
-          <Button asChild><Link href="/">Back to Levels</Link></Button>
+          <Link href="/">
+            <Button className="w-full">Back to Levels</Button>
+          </Link>
         </DialogContent>
       </Dialog>
 
@@ -120,14 +122,16 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
         <DialogContent className="text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl">📋 Game Over</DialogTitle>
-            <DialogDescription asChild>
+            <DialogDescription>
               <div className="space-y-2">
                 <p className="text-lg font-semibold text-red-500">Answer: {answerName}</p>
                 <p className="text-muted-foreground">All {totalClues} clues revealed</p>
               </div>
             </DialogDescription>
           </DialogHeader>
-          <Button asChild><Link href="/">Back to Levels</Link></Button>
+          <Link href="/">
+            <Button className="w-full">Back to Levels</Button>
+          </Link>
         </DialogContent>
       </Dialog>
     </div>

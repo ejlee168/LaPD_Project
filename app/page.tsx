@@ -34,7 +34,7 @@ export default async function HomePage({
         <Input name="q" placeholder="Search cases..." defaultValue={q ?? ""} />
       </form>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {games?.map((game: Game) => (
+        {games?.map((game) => (
           <Link key={game.id} href={`/play/${game.id}`}>
             <Card className="hover:border-foreground/20 transition-colors cursor-pointer">
               <CardHeader>
@@ -49,9 +49,9 @@ export default async function HomePage({
         <p className="text-center text-muted-foreground">No cases found. Be the first to create one!</p>
       )}
       <div className="text-center">
-        <Button asChild>
-          <Link href="/editor">+ Create a Case</Link>
-        </Button>
+        <Link href="/editor">
+          <Button>+ Create a Case</Button>
+        </Link>
       </div>
     </div>
   );
