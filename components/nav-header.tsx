@@ -13,9 +13,9 @@ export function NavHeader() {
           <ShuffleButton />
         </div>
         <nav className="flex items-center gap-3 sm:gap-5">
-          <Link href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
           <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">cases</Link>
-          <Link href="/editor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">create</Link>
+          <Link href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
+          {/* <Link href="/editor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">create</Link> */}
           <div className="-translate-x-2">
             <ThemeToggle />
           </div>
