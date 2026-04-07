@@ -1,0 +1,26 @@
+export interface Diagnosis {
+  id: string;
+  name: string;
+}
+
+export interface Clue {
+  label?: string;
+  text: string;
+}
+
+export interface Game {
+  id: string;
+  title: string;
+  answer_id: string;
+  clues: Clue[];
+  created_at: string;
+  diagnoses?: Diagnosis; // joined
+}
+
+export interface AnkiPack {
+  id: string;
+  name: string;
+  description: string;
+  file_path: string;
+  created_at: string;
+}
