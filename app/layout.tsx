@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Diagnosle",
+  title: "LaPD",
   description: "Guess the diagnosis from clinical clues",
 };
 

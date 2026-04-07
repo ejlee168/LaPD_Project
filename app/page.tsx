@@ -27,7 +27,7 @@ export default async function HomePage({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Diagnosle</h1>
+        <h1 className="text-3xl font-bold">LaPD</h1>
         <p className="text-muted-foreground">Guess the diagnosis from clinical clues</p>
       </div>
       <form className="max-w-md mx-auto">
