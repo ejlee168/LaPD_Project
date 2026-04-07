@@ -97,7 +97,7 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
       <div className="space-y-2">
         <label className="text-sm font-medium">Title</label>
-        <Input placeholder='e.g. "Case #5: Headache"' value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input placeholder='e.g. "Headache"' value={title} onChange={(e) => setTitle(e.target.value)} />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Author <span className="text-muted-foreground font-normal">(optional)</span></label>
@@ -108,7 +108,7 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
         <DiagnosisCombobox diagnoses={diagnoses} value={answerId} onSelect={setAnswerId} placeholder="Select the answer..." />
       </div>
       <div className="space-y-3">
-        <label className="text-sm font-medium">Clues (6 required)</label>
+        <label className="text-sm font-medium">Clues <span className="text-muted-foreground font-normal">(labels optional)</span></label>
         {clues.map((clue, index) => (
           <div key={index} className="space-y-2 rounded-lg border p-3">
             <div className="flex flex-col sm:flex-row gap-2">
@@ -127,9 +127,9 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
                 <button
                   type="button"
                   onClick={() => handleImageSelect(index, null)}
-                  className="absolute -top-2 -right-2 rounded-full bg-destructive p-1 text-destructive-foreground shadow-sm hover:bg-destructive/90"
+                  className="group absolute -top-2 -right-2 rounded-full bg-destructive/50 cursor-pointer p-1 text-destructive-foreground shadow-sm hover:bg-destructive/20"
                 >
-                  <FaXmark className="h-3 w-3" />
+                  <FaXmark className="transition-colors h-3 w-3 text-background group-hover:text-destructive" />
                 </button>
               </div>
             ) : (
