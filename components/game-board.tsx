@@ -36,6 +36,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   const [gameState, setGameState] = useState<"playing" | "won" | "lost">("playing");
   const [dialogOpen, setDialogOpen] = useState(true);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [lightboxVisible, setLightboxVisible] = useState(false);
   const [guessHistory, setGuessHistory] = useState<GuessEntry[]>([]);
 
   const { play } = useSoundEnabled();
@@ -131,7 +132,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
                 <p className="text-base text-center">{clue.text}</p>
                 {clue.imageUrl && (
                   <div className="mt-2 flex justify-center">
-                    <button type="button" onClick={() => setLightboxSrc(clue.imageUrl!)} className="cursor-zoom-in">
+                    <button type="button" onClick={() => { setLightboxSrc(clue.imageUrl!); requestAnimationFrame(() => requestAnimationFrame(() => setLightboxVisible(true))); }} className="cursor-zoom-in">
                       <Image
                         src={clue.imageUrl}
                         alt={`Clue ${index + 1}`}
@@ -238,15 +239,27 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
       {lightboxSrc && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-zoom-out"
-          onClick={() => setLightboxSrc(null)}
+          className={cn(
+            "fixed inset-0 z-50 flex items-center justify-center cursor-zoom-out transition-colors duration-300",
+            lightboxVisible ? "bg-black/80" : "bg-black/0"
+          )}
+          onClick={() => {
+            setLightboxVisible(false);
+            setTimeout(() => setLightboxSrc(null), 300);
+          }}
+          onTransitionEnd={(e) => {
+            if (!lightboxVisible && e.target === e.currentTarget) setLightboxSrc(null);
+          }}
         >
           <Image
             src={lightboxSrc}
             alt="Clue image"
             width={1200}
             height={900}
-            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+            className={cn(
+              "max-h-[90vh] max-w-[90vw] rounded-lg object-contain transition-all duration-300",
+              lightboxVisible ? "scale-100 opacity-100" : "scale-90 opacity-0"
+            )}
           />
         </div>
       )}
