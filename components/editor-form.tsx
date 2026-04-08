@@ -22,9 +22,10 @@ interface ClueInput {
   imagePreview: string | null;
 }
 
-export function EditorForm({ diagnoses }: EditorFormProps) {
+export function EditorForm({ diagnoses: initialDiagnoses }: EditorFormProps) {
   const router = useRouter();
   const { play } = useSoundEnabled();
+  const [diagnoses, setDiagnoses] = useState(initialDiagnoses);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [answerId, setAnswerId] = useState("");
@@ -106,7 +107,14 @@ export function EditorForm({ diagnoses }: EditorFormProps) {
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Correct Diagnosis</label>
-        <DiagnosisCombobox diagnoses={diagnoses} value={answerId} onSelect={setAnswerId} placeholder="Select the answer..." />
+        <DiagnosisCombobox
+          diagnoses={diagnoses}
+          value={answerId}
+          onSelect={setAnswerId}
+          onDiagnosisCreated={(d) => setDiagnoses((prev) => [...prev, d].sort((a, b) => a.name.localeCompare(b.name)))}
+          placeholder="Select the answer..."
+          allowCreate
+        />
       </div>
       <div className="space-y-3">
         <label className="text-sm font-medium">Clues</label>
