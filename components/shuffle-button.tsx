@@ -19,6 +19,7 @@ export function ShuffleButton() {
       const candidates = currentId ? data.filter((g) => g.id !== currentId) : data;
       if (candidates.length === 0) throw new Error("No other cases available");
       const random = candidates[Math.floor(Math.random() * candidates.length)];
+      await new Promise((r) => setTimeout(r, 200));
       router.push(`/play/${random.id}`);
     };
 
