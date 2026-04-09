@@ -16,6 +16,7 @@ import { getHaptics } from "@/lib/haptics";
 import { saveAttempt } from "@/lib/attempts";
 import { useSoundEnabled } from "@/components/sound-provider";
 import { FadeIn } from "./fade-in";
+import { motion } from "motion/react";
 
 interface GameBoardProps {
   game: Game;
@@ -128,7 +129,11 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
             )}
           >
             {index < revealedCount ? (
-              <>
+              <motion.div
+                initial={{ opacity: 0, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <p className="text-base text-center">{clue.text}</p>
                 {clue.imageUrl && (
                   <div className="mt-2 flex justify-center">
@@ -143,7 +148,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
                     </button>
                   </div>
                 )}
-              </>
+              </motion.div>
             ) : (
               <p className="text-base text-center select-none text-muted-foreground">...</p>
             )}
