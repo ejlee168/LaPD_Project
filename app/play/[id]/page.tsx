@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { GameBoard } from "@/components/game-board";
 import { getDiagnoses } from "@/lib/queries";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FadeIn } from "@/components/fade-in";
 import type { Game } from "@/lib/types";
 
@@ -23,11 +25,11 @@ function GameBoardSkeleton() {
       <div className="space-y-3">
         <div className="flex flex-col-reverse sm:flex-row gap-2">
           <div className="flex-1">
-            <Skeleton className="h-8 w-full rounded-lg" />
+            <Input disabled placeholder="Search diagnoses..." />
           </div>
           <div className="flex gap-2">
-            <Skeleton className="h-8 flex-1 sm:flex-initial sm:w-[52px] rounded-lg" />
-            <Skeleton className="h-8 flex-1 sm:flex-initial sm:w-[42px] rounded-lg" />
+            <Button disabled className="flex-1 sm:flex-initial">Guess</Button>
+            <Button disabled variant="outline" className="flex-1 sm:flex-initial">Skip</Button>
           </div>
         </div>
       </div>
