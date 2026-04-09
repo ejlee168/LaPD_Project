@@ -130,6 +130,12 @@
   html {
     @apply font-sans;
     overscroll-behavior: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  /* For Chrome, Safari, and Opera */
+  html::-webkit-scrollbar {
+    display: none;
   }
 }
 
