@@ -9,7 +9,7 @@ export function NavHeader() {
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-2 sm:gap-4">
           {/* <Link href="/" className="hover:scale-103 active:scale-100 transition-transform flex items-center gap-2 text-lg font-bold shrink-0">
-            LaPD
+            🏥🩸 LaPD
           </Link> */}
           <ShuffleButton />
         </div>

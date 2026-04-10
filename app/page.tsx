@@ -45,7 +45,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <FadeIn className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">LaPD Project</h1>
+        <h1 className="text-2xl font-bold">🏥🩸 LaPD Project</h1>
         <p className="text-muted-foreground">guess the diagnosis from clinical clues</p>
       </FadeIn>
       <Suspense fallback={<CaseGridSkeleton />}>
