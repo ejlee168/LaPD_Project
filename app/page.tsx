@@ -14,8 +14,8 @@ function CaseGridSkeleton() {
         <Input placeholder="search cases..." disabled />
         <p>or</p>
         <div className="text-center">
-          <Link href="/editor">
-            <Button className="py-4"><span className="pl-0.5">+</span>create a case</Button>
+          <Link tabIndex={-1} href="/editor" >
+            <Button className="py-4" ><span className="pl-0.5">+</span>create a case</Button>
           </Link>
         </div>
       </div>
