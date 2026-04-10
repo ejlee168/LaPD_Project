@@ -35,7 +35,7 @@ export function CaseGrid({ games }: { games: Game[] }) {
         />
         <p>or</p>
         <div className="text-center">
-          <Link href="/editor">
+          <Link tabIndex={-1} href="/editor">
             <Button className="py-4"><span className="pl-0.5">+</span>create a case</Button>
           </Link>
         </div>

@@ -34,7 +34,7 @@ export function CaseCard({ id, title, author, createdAt, index = 0 }: CaseCardPr
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Link href={`/play/${id}`}>
+      <Link href={`/play/${id}`} className="rounded-xl">
         <Card
           className={cn(
             "transition-all duration-200 cursor-pointer hover:shadow-md active:scale-[0.98]",
