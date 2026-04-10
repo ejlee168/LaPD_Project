@@ -191,7 +191,7 @@ export function DiagnosisCombobox({
             } else if (e.key === "Escape") {
               setOpen(false);
               setHighlightIndex(-1);
-            } else if (e.key === "Enter") {
+            } else if (e.key === "Enter" && !e.metaKey && !e.shiftKey) {
               e.preventDefault();
               // Select highlighted item if one is highlighted
               if (open && highlightIndex >= 0) {
