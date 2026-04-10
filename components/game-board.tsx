@@ -101,6 +101,11 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key !== "Enter" || gameState !== "playing") return;
+      if (e.metaKey || e.shiftKey) {
+        e.preventDefault();
+        handleSkip();
+        return;
+      }
       // Don't double-fire when the combobox input already handles Enter
       if ((e.target as HTMLElement)?.tagName === "INPUT") return;
       e.preventDefault();
