@@ -37,12 +37,14 @@ export function DiagnosisCombobox({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const userEditingRef = useRef(false);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
 
   const filtered = useMemo(() => {
     if (!open && !query.trim()) return [];
     return query.trim()
-      ? diagnoses.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()))
+      ? diagnoses.filter((d) => d.name.toLowerCase().includes(query.trim().toLowerCase()))
       : diagnoses;
   }, [open, query, diagnoses]);
 
@@ -50,6 +52,11 @@ export function DiagnosisCombobox({
     const q = query.trim().toLowerCase();
     return q ? diagnoses.some((d) => d.name.toLowerCase() === q) : true;
   }, [query, diagnoses]);
+
+  // Reset highlight when filtered results change
+  useEffect(() => {
+    setHighlightIndex(-1);
+  }, [filtered]);
 
   function handleSelect(diagnosis: Diagnosis) {
     userEditingRef.current = false;
@@ -143,6 +150,20 @@ export function DiagnosisCombobox({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  function highlightMatch(name: string) {
+    const q = query.trim().toLowerCase();
+    if (!q) return name;
+    const start = name.toLowerCase().indexOf(q);
+    if (start === -1) return name;
+    return (
+      <>
+        {name.slice(0, start)}
+        <span className="font-bold">{name.slice(start, start + q.length)}</span>
+        {name.slice(start + q.length)}
+      </>
+    );
+  }
+
   const showCreateOption = allowCreate && query.trim() && !hasExactMatch;
 
   return (
@@ -153,9 +174,39 @@ export function DiagnosisCombobox({
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setOpen(true)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "ArrowDown") {
               e.preventDefault();
-              // Auto-select if exactly one non-disabled match and nothing selected
+              if (!open) { setOpen(true); return; }
+              setHighlightIndex((prev) => {
+                const max = filtered.length + (showCreateOption ? 1 : 0) - 1;
+                return prev < max ? prev + 1 : 0;
+              });
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              if (!open) { setOpen(true); return; }
+              setHighlightIndex((prev) => {
+                const max = filtered.length + (showCreateOption ? 1 : 0) - 1;
+                return prev > 0 ? prev - 1 : max;
+              });
+            } else if (e.key === "Escape") {
+              setOpen(false);
+              setHighlightIndex(-1);
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              // Select highlighted item if one is highlighted
+              if (open && highlightIndex >= 0) {
+                if (highlightIndex < filtered.length) {
+                  const item = filtered[highlightIndex];
+                  if (!disabledIds?.has(item.id)) {
+                    handleSelect(item);
+                    return;
+                  }
+                } else if (showCreateOption) {
+                  handleCreateClick();
+                  return;
+                }
+              }
+              // Fallback: auto-select if exactly one non-disabled match
               if (!value) {
                 const eligible = filtered.filter((d) => !disabledIds?.has(d.id));
                 if (eligible.length === 1) {
@@ -171,28 +222,36 @@ export function DiagnosisCombobox({
           autoComplete="off"
         />
         {open && query.trim() && (filtered.length > 0 || showCreateOption) && (
-          <ul className="absolute z-50 mt-1 max-h-50 w-full overflow-auto rounded-md border bg-popover p-1 shadow-md">
-            {filtered.map((diagnosis) => {
+          <ul ref={listRef} className="absolute z-50 mt-1 max-h-50 w-full overflow-auto rounded-md border bg-popover p-1 shadow-md">
+            {filtered.map((diagnosis, index) => {
               const isDisabled = disabledIds?.has(diagnosis.id);
               const isSelected = diagnosis.id === value;
+              const isHighlighted = index === highlightIndex;
               return (
                 <li
                   key={diagnosis.id}
+                  ref={(el) => { if (isHighlighted && el) el.scrollIntoView({ block: "nearest" }); }}
                   onClick={() => !isDisabled && handleSelect(diagnosis)}
+                  onMouseEnter={() => setHighlightIndex(index)}
                   className={cn(
                     "cursor-pointer rounded-sm px-2 py-1.5 text-base",
-                    isSelected && "bg-accent text-accent-foreground",
+                    (isSelected || isHighlighted) && "bg-accent text-accent-foreground",
                     isDisabled ? "opacity-40 line-through cursor-not-allowed" : "hover:bg-accent hover:text-accent-foreground",
                   )}
                 >
-                  {diagnosis.name}
+                  {highlightMatch(diagnosis.name)}
                 </li>
               );
             })}
             {showCreateOption && (
               <li
+                ref={(el) => { if (highlightIndex === filtered.length && el) el.scrollIntoView({ block: "nearest" }); }}
                 onClick={handleCreateClick}
-                className="cursor-pointer rounded-sm px-2 py-1.5 text-base text-primary hover:bg-accent hover:text-accent-foreground"
+                onMouseEnter={() => setHighlightIndex(filtered.length)}
+                className={cn(
+                  "cursor-pointer rounded-sm px-2 py-1.5 text-base text-primary hover:bg-accent hover:text-accent-foreground",
+                  highlightIndex === filtered.length && "bg-accent text-accent-foreground",
+                )}
               >
                 + Create &quot;{query.trim()}&quot;
               </li>
