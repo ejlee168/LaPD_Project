@@ -37,7 +37,7 @@ export function CaseCard({ id, title, author, createdAt, index = 0 }: CaseCardPr
       <Link href={`/play/${id}`} className="group block rounded-xl">
         <Card
           className={cn(
-            "transition-transform duration-200 cursor-pointer hover:shadow-md active:scale-[0.98]",
+            "transition-shadow transition-transform duration-200 cursor-pointer hover:shadow-md active:scale-[0.98]",
             won && "border-green-500/50 bg-green-500/5",
             lost && "border-red-500/50 bg-red-500/5",
             !won && !lost && "hover:border-foreground/20",
