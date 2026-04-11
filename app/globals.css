@@ -156,6 +156,27 @@
     @apply scale-[0.97];
   }
 
+  /* Truncated title that scroll-reveals on hover/focus */
+  .marquee-clip {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    container-type: inline-size;
+  }
+  .marquee-track {
+    display: inline-block;
+    transform: translateX(0);
+  }
+  .group:hover .marquee-track,
+  .group:focus-within .marquee-track {
+    animation: marquee-scroll 7s ease-in-out 0.25s 1 forwards;
+  }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(min(0px, 100cqi - 100%)); }
+  }
+
   /* Smooth underline for nav links */
   nav a {
     @apply relative;

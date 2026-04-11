@@ -34,7 +34,7 @@ export function CaseCard({ id, title, author, createdAt, index = 0 }: CaseCardPr
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Link href={`/play/${id}`} className="rounded-xl">
+      <Link href={`/play/${id}`} className="group block rounded-xl">
         <Card
           className={cn(
             "transition-all duration-200 cursor-pointer hover:shadow-md active:scale-[0.98]",
@@ -45,8 +45,10 @@ export function CaseCard({ id, title, author, createdAt, index = 0 }: CaseCardPr
         >
           <CardHeader>
             <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <CardTitle className="text-base">{title}</CardTitle>
+              <div className="min-w-0 flex-1">
+                <CardTitle className="marquee-clip text-base">
+                  <span className="marquee-track">{title}</span>
+                </CardTitle>
                 <CardDescription>
                   {new Date(createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   {author && ` | ${author}`}
