@@ -31,6 +31,7 @@ export async function generateMetadata({
 function GameBoardSkeleton() {
   return (
     <div className="space-y-6">
+      <div className="h-8" />
       <div className="space-y-3">
         <div className="rounded-lg border p-4">
           <Skeleton className="h-6 w-full" />
@@ -99,9 +100,6 @@ export default async function PlayPage({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <FadeIn className="text-center space-y-1">
-        <h1 className="text-2xl font-bold">What&apos;s the diagnosis?</h1>
-      </FadeIn>
       <Suspense fallback={<GameBoardSkeleton />}>
         <GameLoader id={id} />
       </Suspense>

@@ -123,6 +123,9 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
   return (
     <div className="space-y-6">
+      <FadeIn className="text-center space-y-1">
+        <h1 className="text-2xl font-bold">{game.title}</h1>
+      </FadeIn>
       <div className="space-y-3">
         {game.clues.map((clue, index) => (
           <div
