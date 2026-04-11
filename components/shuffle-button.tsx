@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getAllAttempts } from "@/lib/attempts";
+import { getShuffleFilters, type ShuffleFilter } from "@/lib/shuffle-filter";
 
 interface ShuffleButtonProps {
   label?: string;
@@ -18,13 +20,28 @@ export function ShuffleButton({ label, className, variant = "ghost" }: ShuffleBu
   const pathname = usePathname();
 
   async function handleShuffle() {
+    const filters = getShuffleFilters();
+    const attempts = getAllAttempts();
+
     const promise = async () => {
       const supabase = createClient();
       const { data } = await supabase.from("games").select("id");
       if (!data || data.length === 0) throw new Error("No cases found");
       const currentId = pathname.startsWith("/play/") ? pathname.split("/")[2] : null;
-      const candidates = currentId ? data.filter((g) => g.id !== currentId) : data;
-      if (candidates.length === 0) throw new Error("No other cases available");
+      const withoutCurrent = currentId ? data.filter((g) => g.id !== currentId) : data;
+      if (withoutCurrent.length === 0) throw new Error("No other cases available");
+
+      const candidates = withoutCurrent.filter((g) => {
+        const attempt = attempts[g.id];
+        const category: ShuffleFilter = !attempt
+          ? "unseen"
+          : attempt.result === "won"
+            ? "completed"
+            : "failed";
+        return filters.includes(category);
+      });
+      if (candidates.length === 0) throw new Error("No cases match your shuffle filter");
+
       const random = candidates[Math.floor(Math.random() * candidates.length)];
       await new Promise((r) => setTimeout(r, 200));
       router.push(`/play/${random.id}`);
@@ -33,7 +50,7 @@ export function ShuffleButton({ label, className, variant = "ghost" }: ShuffleBu
     toast.promise(promise(), {
       loading: "Shuffling...",
       success: "Here's a random case!",
-      error: "Failed to load cases",
+      error: (err) => (err instanceof Error ? err.message : "Failed to load cases"),
       duration: 1500,
     });
   }

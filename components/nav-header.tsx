@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { LuSettings } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShuffleButton } from "@/components/shuffle-button";
 import { SoundToggle } from "@/components/sound-toggle";
@@ -18,10 +20,14 @@ export function NavHeader() {
           <Link data-no-click-sound href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
           {/* <Link href="/editor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">create</Link> */}
           <SoundToggle />
-          <div className="-translate-x-2">
+          <div className="-translate-x-2 sm:-translate-x-4 flex items-center gap-1">
             <ThemeToggle />
+            <Link className="after:content-none" data-no-click-sound tabIndex={-1} href="/settings" aria-label="Settings">
+              <Button variant="ghost" size="icon" className="text-muted-foreground">
+                <LuSettings className="h-[1.2rem] w-[1.2rem]" />
+              </Button>
+            </Link>
           </div>
-
         </nav>
       </div>
     </header>
