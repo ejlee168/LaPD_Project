@@ -172,7 +172,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
               {gameState === "won" ? `Correct! ${answerName}` : `Answer: ${answerName}`}
             </span>
             <Link href="/" className="ml-3 underline underline-offset-2 text-muted-foreground hover:text-foreground">
-              Back to Levels
+              Back to Cases
             </Link>
           </div>
           {guessHistory.length > 0 && (
@@ -246,7 +246,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
             <Button variant="outline" onClick={() => { setRevealedCount(totalClues); setDialogOpen(false); }}>Admire Puzzle</Button>
             <div className="flex flex-row gap-2">
               <Link href="/" className="flex-1">
-                <Button className="w-full">Back to Levels</Button>
+                <Button className="w-full">Back to Cases</Button>
               </Link>
               <ShuffleButton label="Random Puzzle" variant="default" className="flex-1" />
             </div>
