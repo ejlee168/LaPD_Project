@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { GameBoard } from "@/components/game-board";
@@ -8,6 +9,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FadeIn } from "@/components/fade-in";
 import type { Game } from "@/lib/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("games")
+    .select("title")
+    .eq("id", id)
+    .single();
+
+  return {
+    title: `🏥🩸 LaPD | ${data?.title}`,
+  };
+}
 
 function GameBoardSkeleton() {
   return (
