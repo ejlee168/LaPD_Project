@@ -63,6 +63,7 @@ export function EditorForm({ diagnoses: initialDiagnoses }: EditorFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) { play("error"); toast.error("Title is required", { duration: 1500 }); return; }
+    if (author.trim().length >= 15) { play("error"); toast.error("Author name must be under 15 characters", { duration: 1500 }); return; }
     if (!answerId) { play("error"); toast.error("Select a correct diagnosis", { duration: 1500 }); return; }
     if (clues.some((c) => !c.text.trim())) { play("error"); toast.error("All 6 clue texts are required", { duration: 1500 }); return; }
     play("click");
@@ -103,7 +104,7 @@ export function EditorForm({ diagnoses: initialDiagnoses }: EditorFormProps) {
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Author <span className="text-muted-foreground font-normal">(optional)</span></label>
-        <Input placeholder="Your name" value={author} onChange={(e) => setAuthor(e.target.value)} />
+        <Input placeholder="Your name" value={author} maxLength={14} onChange={(e) => setAuthor(e.target.value)} />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Correct Diagnosis</label>
