@@ -61,7 +61,7 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
       if (muted) return;
       const target = e.target as HTMLElement;
       if (target.closest("[data-no-click-sound]")) return;
-      if (target.closest("button, [role='button'], a, [data-slot='dropdown-menu-item']")) {
+      if (target.closest("button, [role='button'], a, [data-slot='dropdown-menu-item'], [data-slot='dropdown-menu-checkbox-item'], [data-slot='dropdown-menu-radio-item']")) {
         const h = getHowl();
         const id = h.play("click");
         h.rate(0.8 + Math.random() * 0.2, id);
