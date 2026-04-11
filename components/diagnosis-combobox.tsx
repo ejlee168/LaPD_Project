@@ -61,20 +61,35 @@ export function DiagnosisCombobox({
     direct = open ? diagnoses : [];
   } else {
     const qNoSpace = q.replace(/\s+/g, "");
+    // Rank direct hits by match strength: earlier substring position (0 = startsWith)
+    // beats later position; initialism-only hits land after substring hits.
+    const scored: { d: Diagnosis; rank: number }[] = [];
     const directIds = new Set<string>();
     for (const d of diagnoses) {
       const nameLower = d.name.toLowerCase();
+      const subIdx = nameLower.indexOf(q);
       const initials = d.name
         .split(/\s+/)
         .map((w) => w.charAt(0).toLowerCase())
         .join("");
-      if (nameLower.includes(q) || initials.startsWith(qNoSpace)) {
-        direct.push(d);
+      const initialsHit = initials.startsWith(qNoSpace);
+      if (subIdx !== -1) {
+        scored.push({ d, rank: subIdx });
+        directIds.add(d.id);
+      } else if (initialsHit) {
+        // Initialism hits ranked after substring hits (big constant offset)
+        scored.push({ d, rank: 10_000 });
         directIds.add(d.id);
       }
     }
+    direct = scored.sort((a, b) => a.rank - b.rank).map((s) => s.d);
+
+    // Fuse returns results sorted by score ascending (best first). Make the sort
+    // explicit so we don't rely on default behavior silently changing.
     suggestions = fuse
       .search(q)
+      .slice()
+      .sort((a, b) => (a.score ?? 1) - (b.score ?? 1))
       .map((r) => r.item)
       .filter((d) => !directIds.has(d.id));
   }
