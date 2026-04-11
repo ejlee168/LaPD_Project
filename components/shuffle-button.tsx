@@ -5,8 +5,15 @@ import { LuShuffle } from "react-icons/lu";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-export function ShuffleButton() {
+interface ShuffleButtonProps {
+  label?: string;
+  className?: string;
+  variant?: "default" | "ghost" | "outline";
+}
+
+export function ShuffleButton({ label, className, variant = "ghost" }: ShuffleButtonProps = {}) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -33,12 +40,13 @@ export function ShuffleButton() {
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
       onClick={handleShuffle}
-      className="text-muted-foreground"
+      className={cn(variant === "ghost" && "text-muted-foreground", className)}
       aria-label="Random case"
     >
       <LuShuffle className="h-4 w-4" />
+      {label}
     </Button>
   );
 }

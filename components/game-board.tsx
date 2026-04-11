@@ -17,6 +17,7 @@ import { saveAttempt } from "@/lib/attempts";
 import { useSoundEnabled } from "@/components/sound-provider";
 import { FadeIn } from "./fade-in";
 import { motion } from "motion/react";
+import { ShuffleButton } from "@/components/shuffle-button";
 
 interface GameBoardProps {
   game: Game;
@@ -112,7 +113,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
       handleGuess();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedDiagnosis, gameState, allRevealed],
+    [selectedDiagnosis, gameState, revealedCount],
   );
 
   useEffect(() => {
@@ -240,9 +241,12 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
           </DialogHeader>
           <div className="flex flex-col gap-2">
             <Button variant="outline" onClick={() => { setRevealedCount(totalClues); setDialogOpen(false); }}>Admire Puzzle</Button>
-            <Link href="/">
-              <Button className="w-full">Back to Levels</Button>
-            </Link>
+            <div className="flex flex-row gap-2">
+              <Link href="/" className="flex-1">
+                <Button className="w-full">Back to Levels</Button>
+              </Link>
+              <ShuffleButton label="Random Puzzle" variant="default" className="flex-1" />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
