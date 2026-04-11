@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { LuArrowUpDown, LuFilter } from "react-icons/lu";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,13 +11,33 @@ import { FadeIn } from "@/components/fade-in";
 function CaseGridSkeleton() {
   return (
     <>
-      <div className="flex flex-row max-w-md mx-auto items-center gap-5">
-        <Input placeholder="search cases..." disabled />
-        <p>or</p>
-        <div className="text-center">
-          <Link tabIndex={-1} href="/editor" >
-            <Button className="py-4" ><span className="pl-0.5">+</span>create a case</Button>
-          </Link>
+      <div className="relative flex flex-col items-center gap-3 sm:block">
+        <div className="flex flex-row max-w-md mx-auto items-center gap-5 w-full">
+          <Input placeholder="search cases..." disabled />
+          <p>or</p>
+          <div className="text-center">
+            <Link tabIndex={-1} href="/editor" >
+              <Button className="py-4" ><span className="pl-0.5">+</span>create a case</Button>
+            </Link>
+          </div>
+        </div>
+        <div className="flex flex-row gap-1 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Filter cases"
+            className="text-muted-foreground"
+          >
+            <LuFilter className="h-[1.2rem] w-[1.2rem]" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Sort cases"
+            className="text-muted-foreground"
+          >
+            <LuArrowUpDown className="h-[1.2rem] w-[1.2rem]" />
+          </Button>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
