@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
+import Fuse from "fuse.js";
 import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
@@ -41,22 +42,50 @@ export function DiagnosisCombobox({
   const userEditingRef = useRef(false);
   const [highlightIndex, setHighlightIndex] = useState(-1);
 
-  const filtered = useMemo(() => {
-    if (!open && !query.trim()) return [];
-    return query.trim()
-      ? diagnoses.filter((d) => d.name.toLowerCase().includes(query.trim().toLowerCase()))
-      : diagnoses;
-  }, [open, query, diagnoses]);
+  // Two-section matcher: confident direct/initialism hits vs. fuzzy "did you mean?".
+  // The React Compiler memoizes this; Fuse index is rebuilt per render but the compiler
+  // will cache `new Fuse(diagnoses, ...)` across renders where `diagnoses` is stable.
+  const fuse = new Fuse(diagnoses, {
+    keys: ["name"],
+    threshold: 0.35,
+    ignoreLocation: true,
+    includeScore: true,
+    minMatchCharLength: 2,
+  });
 
-  const hasExactMatch = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q ? diagnoses.some((d) => d.name.toLowerCase() === q) : true;
-  }, [query, diagnoses]);
+  const q = query.trim().toLowerCase();
+  let direct: Diagnosis[] = [];
+  let suggestions: Diagnosis[] = [];
 
-  // Reset highlight when filtered results change
+  if (!q) {
+    direct = open ? diagnoses : [];
+  } else {
+    const qNoSpace = q.replace(/\s+/g, "");
+    const directIds = new Set<string>();
+    for (const d of diagnoses) {
+      const nameLower = d.name.toLowerCase();
+      const initials = d.name
+        .split(/\s+/)
+        .map((w) => w.charAt(0).toLowerCase())
+        .join("");
+      if (nameLower.includes(q) || initials.startsWith(qNoSpace)) {
+        direct.push(d);
+        directIds.add(d.id);
+      }
+    }
+    suggestions = fuse
+      .search(q)
+      .map((r) => r.item)
+      .filter((d) => !directIds.has(d.id));
+  }
+
+  const hasExactMatch = q ? diagnoses.some((d) => d.name.toLowerCase() === q) : true;
+
+  // Reset highlight when the query changes. (Depending on the `direct`/`suggestions`
+  // arrays would re-fire every render — they're fresh references without useMemo.)
   useEffect(() => {
     setHighlightIndex(-1);
-  }, [filtered]);
+  }, [query]);
 
   function handleSelect(diagnosis: Diagnosis) {
     userEditingRef.current = false;
@@ -166,6 +195,13 @@ export function DiagnosisCombobox({
 
   const showCreateOption = allowCreate && query.trim() && !hasExactMatch;
 
+  // Flat list of selectable items for keyboard navigation.
+  // Order matches render order: direct hits, then fuzzy suggestions, then create.
+  // The "Did you mean?" header is NOT in this list — it's not selectable.
+  const flatItems = [...direct, ...suggestions];
+  const flatCount = flatItems.length + (showCreateOption ? 1 : 0);
+  const createIndex = showCreateOption ? flatItems.length : -1;
+
   return (
     <>
       <div ref={wrapperRef} className="relative">
@@ -177,17 +213,13 @@ export function DiagnosisCombobox({
             if (e.key === "ArrowDown") {
               e.preventDefault();
               if (!open) { setOpen(true); return; }
-              setHighlightIndex((prev) => {
-                const max = filtered.length + (showCreateOption ? 1 : 0) - 1;
-                return prev < max ? prev + 1 : 0;
-              });
+              if (flatCount === 0) return;
+              setHighlightIndex((prev) => (prev < flatCount - 1 ? prev + 1 : 0));
             } else if (e.key === "ArrowUp") {
               e.preventDefault();
               if (!open) { setOpen(true); return; }
-              setHighlightIndex((prev) => {
-                const max = filtered.length + (showCreateOption ? 1 : 0) - 1;
-                return prev > 0 ? prev - 1 : max;
-              });
+              if (flatCount === 0) return;
+              setHighlightIndex((prev) => (prev > 0 ? prev - 1 : flatCount - 1));
             } else if (e.key === "Escape") {
               setOpen(false);
               setHighlightIndex(-1);
@@ -195,20 +227,20 @@ export function DiagnosisCombobox({
               e.preventDefault();
               // Select highlighted item if one is highlighted
               if (open && highlightIndex >= 0) {
-                if (highlightIndex < filtered.length) {
-                  const item = filtered[highlightIndex];
-                  if (!disabledIds?.has(item.id)) {
-                    handleSelect(item);
-                    return;
-                  }
-                } else if (showCreateOption) {
+                if (highlightIndex === createIndex) {
                   handleCreateClick();
                   return;
                 }
+                const item = flatItems[highlightIndex];
+                if (item && !disabledIds?.has(item.id)) {
+                  handleSelect(item);
+                  return;
+                }
               }
-              // Fallback: auto-select if exactly one non-disabled match
+              // Fallback: auto-select if exactly one non-disabled DIRECT match.
+              // Suggestions are deliberately excluded — they're guesses, not confident hits.
               if (!value) {
-                const eligible = filtered.filter((d) => !disabledIds?.has(d.id));
+                const eligible = direct.filter((d) => !disabledIds?.has(d.id));
                 if (eligible.length === 1) {
                   onSelect(eligible[0].id);
                   setQuery(eligible[0].name);
@@ -221,18 +253,19 @@ export function DiagnosisCombobox({
           placeholder={placeholder}
           autoComplete="off"
         />
-        {open && query.trim() && (filtered.length > 0 || showCreateOption) && (
+        {open && query.trim() && (flatItems.length > 0 || showCreateOption) && (
           <ul ref={listRef} className="absolute z-50 mt-1 max-h-50 w-full overflow-auto rounded-md border bg-popover p-1 shadow-md">
-            {filtered.map((diagnosis, index) => {
+            {direct.map((diagnosis, i) => {
+              const flatIndex = i;
               const isDisabled = disabledIds?.has(diagnosis.id);
               const isSelected = diagnosis.id === value;
-              const isHighlighted = index === highlightIndex;
+              const isHighlighted = flatIndex === highlightIndex;
               return (
                 <li
                   key={diagnosis.id}
                   ref={(el) => { if (isHighlighted && el) el.scrollIntoView({ block: "nearest" }); }}
                   onClick={() => !isDisabled && handleSelect(diagnosis)}
-                  onMouseEnter={() => setHighlightIndex(index)}
+                  onMouseEnter={() => setHighlightIndex(flatIndex)}
                   className={cn(
                     "cursor-pointer rounded-sm px-2 py-1.5 text-base",
                     (isSelected || isHighlighted) && "bg-accent text-accent-foreground",
@@ -243,14 +276,47 @@ export function DiagnosisCombobox({
                 </li>
               );
             })}
+            {suggestions.length > 0 && (
+              <li
+                className={cn(
+                  "px-2 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground",
+                  direct.length > 0 && "mt-1 border-t",
+                )}
+                aria-hidden="true"
+              >
+                Did you mean?
+              </li>
+            )}
+            {suggestions.map((diagnosis, i) => {
+              const flatIndex = direct.length + i;
+              const isDisabled = disabledIds?.has(diagnosis.id);
+              const isSelected = diagnosis.id === value;
+              const isHighlighted = flatIndex === highlightIndex;
+              return (
+                <li
+                  key={diagnosis.id}
+                  ref={(el) => { if (isHighlighted && el) el.scrollIntoView({ block: "nearest" }); }}
+                  onClick={() => !isDisabled && handleSelect(diagnosis)}
+                  onMouseEnter={() => setHighlightIndex(flatIndex)}
+                  className={cn(
+                    "cursor-pointer rounded-sm px-2 py-1.5 text-base",
+                    (isSelected || isHighlighted) && "bg-accent text-accent-foreground",
+                    isDisabled ? "opacity-40 line-through cursor-not-allowed" : "hover:bg-accent hover:text-accent-foreground",
+                  )}
+                >
+                  {diagnosis.name}
+                </li>
+              );
+            })}
             {showCreateOption && (
               <li
-                ref={(el) => { if (highlightIndex === filtered.length && el) el.scrollIntoView({ block: "nearest" }); }}
+                ref={(el) => { if (highlightIndex === createIndex && el) el.scrollIntoView({ block: "nearest" }); }}
                 onClick={handleCreateClick}
-                onMouseEnter={() => setHighlightIndex(filtered.length)}
+                onMouseEnter={() => setHighlightIndex(createIndex)}
                 className={cn(
                   "cursor-pointer rounded-sm px-2 py-1.5 text-base text-primary hover:bg-accent hover:text-accent-foreground",
-                  highlightIndex === filtered.length && "bg-accent text-accent-foreground",
+                  direct.length + suggestions.length > 0 && "mt-1 border-t",
+                  highlightIndex === createIndex && "bg-accent text-accent-foreground",
                 )}
               >
                 + Create &quot;{query.trim()}&quot;
@@ -258,7 +324,7 @@ export function DiagnosisCombobox({
             )}
           </ul>
         )}
-        {open && query.trim() && filtered.length === 0 && !showCreateOption && (
+        {open && query.trim() && flatItems.length === 0 && !showCreateOption && (
           <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover p-2 text-base text-muted-foreground shadow-md">
             No diagnosis found.
           </div>
