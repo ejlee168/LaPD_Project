@@ -5,6 +5,7 @@ import { NavHeader } from "@/components/nav-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer"
 import { SoundProvider } from "@/components/sound-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,12 +33,14 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
           <SoundProvider>
-            <div className="flex min-h-screen flex-col">
-              <NavHeader />
-              <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
-              <Footer />
-            </div>
-            <Toaster />
+            <TooltipProvider delay={1000}>
+              <div className="flex min-h-screen flex-col">
+                <NavHeader />
+                <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
+                <Footer />
+              </div>
+              <Toaster />
+            </TooltipProvider>
           </SoundProvider>
         </ThemeProvider>
       </body>
