@@ -18,6 +18,8 @@ import { useSoundEnabled } from "@/components/sound-provider";
 import { FadeIn } from "./fade-in";
 import { motion } from "motion/react";
 import { ShuffleButton } from "@/components/shuffle-button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
 interface GameBoardProps {
   game: Game;
@@ -142,6 +144,7 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
                 initial={{ opacity: 0, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
+                className="transition-all duration-0"
               >
                 <p className="text-base text-center">{clue.text}</p>
                 {clue.imageUrl && (
@@ -205,8 +208,24 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
               />
             </div>
             <div className="flex gap-2">
-              <Button data-no-click-sound onClick={handleGuess} className="flex-1 sm:flex-initial">Guess</Button>
-              <Button data-no-click-sound variant="outline" onClick={handleSkip} className="flex-1 sm:flex-initial">Skip</Button>
+              <Tooltip>
+                <TooltipTrigger render={<span className="flex-1 sm:flex-initial" />}>
+                  <Button data-no-click-sound onClick={handleGuess} className="w-full">Guess</Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="flex font-bold flex-col justify-center items-center">
+                  Guess
+                  <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger render={<span className="flex-1 sm:flex-initial" />}>
+                  <Button data-no-click-sound variant="outline" onClick={handleSkip} className="w-full">Skip</Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="flex font-bold flex-col justify-center items-center">
+                  Skip
+                  <KbdGroup><Kbd>⇧</Kbd><Kbd>↵</Kbd></KbdGroup>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 
