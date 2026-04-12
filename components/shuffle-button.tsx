@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { LuShuffle } from "react-icons/lu";
 import { createClient } from "@/lib/supabase/client";
@@ -15,7 +16,7 @@ interface ShuffleButtonProps {
   variant?: "default" | "ghost" | "outline";
 }
 
-export function ShuffleButton({ label, className, variant = "ghost" }: ShuffleButtonProps = {}) {
+export const ShuffleButton = forwardRef<HTMLButtonElement, ShuffleButtonProps>(function ShuffleButton({ label, className, variant = "ghost" }, ref) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -57,6 +58,7 @@ export function ShuffleButton({ label, className, variant = "ghost" }: ShuffleBu
 
   return (
     <Button
+      ref={ref}
       variant={variant}
       onClick={handleShuffle}
       className={cn(variant === "ghost" && "text-muted-foreground", className)}
@@ -66,4 +68,4 @@ export function ShuffleButton({ label, className, variant = "ghost" }: ShuffleBu
       {label}
     </Button>
   );
-}
+});
