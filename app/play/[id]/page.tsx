@@ -24,7 +24,7 @@ export async function generateMetadata({
     .single();
 
   return {
-    title: `🏥🩸 LaPD | ${data?.title}`,
+    title: `🏥🩸 Code Blue | ${data?.title}`,
   };
 }
 

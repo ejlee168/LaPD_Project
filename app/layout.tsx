@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "🏥🩸 LaPD",
+  title: "🏥🩸 LaPD Code Blue",
   description: "Guess the diagnosis from clinical clues",
 };
 
