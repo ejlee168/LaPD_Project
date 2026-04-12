@@ -23,6 +23,12 @@ export function CaseCard({ id, title, author, createdAt, index = 0 }: CaseCardPr
   useEffect(() => {
     setAttempt(getAttempt(id));
     setMounted(true);
+
+    function onStorage(e: StorageEvent) {
+      if (e.key === "lapd-attempts") setAttempt(getAttempt(id));
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, [id]);
 
   const won = mounted && attempt?.result === "won";
