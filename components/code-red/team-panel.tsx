@@ -8,7 +8,6 @@ import {
   pickTeam,
   claimSpymaster,
   relinquishSpymaster,
-  kickPlayer,
 } from "@/lib/code-red/client";
 import { canClaimSpymaster } from "@/lib/code-red/rules";
 import type { CrPlayer, Team } from "@/lib/code-red/types";
@@ -44,27 +43,16 @@ export function TeamPanel({ code, token, team, players, me, online }: Props) {
             <li className="text-muted-foreground text-sm">No one here yet</li>
           )}
           {onTeam.map((p) => (
-            <li key={p.id} className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2">
-                <span
-                  className={cn(
-                    "inline-block size-2 rounded-full",
-                    online.has(p.player_token) ? "bg-emerald-500" : "bg-muted-foreground/40",
-                  )}
-                />
-                <span>{p.nickname}</span>
-                {p.is_spymaster && (
-                  <span className="text-xs rounded bg-foreground/10 px-1.5 py-0.5">spy</span>
+            <li key={p.id} className="flex items-center gap-2 text-sm">
+              <span
+                className={cn(
+                  "inline-block size-2 rounded-full",
+                  online.has(p.player_token) ? "bg-emerald-500" : "bg-muted-foreground/40",
                 )}
-              </span>
-              {me && p.id !== me.id && (
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => run(() => kickPlayer(code, token, p.id))}
-                >
-                  kick
-                </Button>
+              />
+              <span>{p.nickname}</span>
+              {p.is_spymaster && (
+                <span className="text-xs rounded bg-foreground/10 px-1.5 py-0.5">spy</span>
               )}
             </li>
           ))}
