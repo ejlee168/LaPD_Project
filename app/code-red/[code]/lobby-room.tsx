@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { subscribeToLobby, subscribeToGame, subscribeToPresence } from "@/lib/code-red/realtime";
 import { getOrCreatePlayerToken } from "@/lib/code-red/player-token";
-import { joinLobby } from "@/lib/code-red/client";
+import { joinLobby, startGame, playAgain } from "@/lib/code-red/client";
+import { canStartGame } from "@/lib/code-red/rules";
 import { LobbyHeader } from "@/components/code-red/lobby-header";
+import { TeamPanel } from "@/components/code-red/team-panel";
+import { SpectatorList } from "@/components/code-red/spectator-list";
+import { Button } from "@/components/ui/button";
 import type { CrLobby, CrPlayer, CrGame, CrCard } from "@/lib/code-red/types";
 
 interface Props {
@@ -111,13 +115,45 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
   return (
     <div className="space-y-4 max-w-4xl mx-auto">
       <LobbyHeader code={lobby.code} me={me} token={token} />
-      <p className="text-xs text-muted-foreground text-center">
-        status: {lobby.status} · online: {online.size} · players: {players.length}
-      </p>
-      <p className="text-center text-muted-foreground text-sm">
-        Lobby / Game UI coming in next tasks.{" "}
-        {game ? `Latest game: ${game.status}` : "No game yet."}
-      </p>
+      {lobby.status !== "in_game" ? (
+        <>
+          {lobby.status === "finished" && game && (
+            <div className="rounded-lg border px-4 py-2 text-sm text-center">
+              Last game: <span className="font-medium">{game.status.replace("_", " ")}</span>
+            </div>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TeamPanel code={lobby.code} token={token} team="red"  players={players} me={me} online={online} />
+            <TeamPanel code={lobby.code} token={token} team="blue" players={players} me={me} online={online} />
+          </div>
+          <SpectatorList players={players} online={online} />
+          <div className="flex justify-center gap-2">
+            {lobby.status === "lobby" && (
+              <Button
+                disabled={!canStartGame(players)}
+                onClick={async () => {
+                  try { await startGame(lobby.code, token); }
+                  catch (e) { toast.error((e as Error).message); }
+                }}
+              >
+                Start game
+              </Button>
+            )}
+            {lobby.status === "finished" && (
+              <Button
+                onClick={async () => {
+                  try { await playAgain(lobby.code, token); }
+                  catch (e) { toast.error((e as Error).message); }
+                }}
+              >
+                Play again
+              </Button>
+            )}
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-muted-foreground text-sm">Game board coming in Task 14.</p>
+      )}
     </div>
   );
 }
