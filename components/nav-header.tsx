@@ -73,6 +73,7 @@ export function NavHeader() {
         </div>
         <nav className="flex items-center gap-3 sm:gap-5">
           <Link data-no-click-sound href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">cases</Link>
+          <Link data-no-click-sound href="/code-red" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">code red</Link>
           <Link data-no-click-sound href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
           <Tooltip>
             <TooltipTrigger render={<span />}>

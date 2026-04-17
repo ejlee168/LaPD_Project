@@ -16,6 +16,9 @@ import { TurnBanner } from "@/components/code-red/turn-banner";
 import { ClueForm } from "@/components/code-red/clue-form";
 import { ActionLog } from "@/components/code-red/action-log";
 import { Button } from "@/components/ui/button";
+import {
+  Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle,
+} from "@/components/ui/drawer";
 import type { CrLobby, CrPlayer, CrGame, CrCard, CrAction } from "@/lib/code-red/types";
 
 interface Props {
@@ -171,15 +174,34 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
           </div>
         </>
       ) : (
-        <div className="space-y-3">
-          <TurnBanner game={game} />
-          <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
-          <ClueForm code={lobby.code} token={token} me={me} game={game} />
-          <ActionLog
-            actions={actions}
-            nicknameByPlayerId={Object.fromEntries(players.map((p) => [p.id, p.nickname]))}
-          />
-        </div>
+        (() => {
+          const nicknameByPlayerId = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
+          return (
+            <div className="space-y-3">
+              <TurnBanner game={game} />
+              <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
+              <ClueForm code={lobby.code} token={token} me={me} game={game} />
+              <div className="hidden sm:block">
+                <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} />
+              </div>
+              <div className="sm:hidden">
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Show log ({actions.length})
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader><DrawerTitle>Action log</DrawerTitle></DrawerHeader>
+                    <div className="p-4">
+                      <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} />
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+            </div>
+          );
+        })()
       )}
     </div>
   );
