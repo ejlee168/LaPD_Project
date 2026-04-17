@@ -159,3 +159,117 @@ begin
 
   delete from cr_players where id = p_target_player_id and lobby_id = v_lobby_id;
 end $$;
+
+-- ---------------------------------------------------------------------------
+-- Game lifecycle
+-- ---------------------------------------------------------------------------
+
+create or replace function cr_start_game(p_code text, p_player_token text)
+returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+  v_lobby_id uuid;
+  v_caller_exists boolean;
+  v_red_spy int;
+  v_red_op int;
+  v_blue_spy int;
+  v_blue_op int;
+  v_sign_count int;
+  v_starting_team text;
+  v_other_team text;
+  v_game_id uuid;
+  v_types text[];
+  v_signs uuid[];
+  i int;
+begin
+  select id into v_lobby_id from cr_lobbies where code = p_code;
+  if v_lobby_id is null then
+    raise exception 'Lobby not found';
+  end if;
+
+  select exists(
+    select 1 from cr_players where lobby_id = v_lobby_id and player_token = p_player_token
+  ) into v_caller_exists;
+  if not v_caller_exists then
+    raise exception 'You are not in this lobby';
+  end if;
+
+  select
+    count(*) filter (where team='red'  and is_spymaster),
+    count(*) filter (where team='red'  and not is_spymaster),
+    count(*) filter (where team='blue' and is_spymaster),
+    count(*) filter (where team='blue' and not is_spymaster)
+  into v_red_spy, v_red_op, v_blue_spy, v_blue_op
+  from cr_players where lobby_id = v_lobby_id;
+
+  if v_red_spy < 1 or v_red_op < 1 or v_blue_spy < 1 or v_blue_op < 1 then
+    raise exception 'Each team needs at least one spymaster and one operative';
+  end if;
+
+  select count(*) into v_sign_count from signs;
+  if v_sign_count < 25 then
+    raise exception 'Need at least 25 signs to start a game';
+  end if;
+
+  v_starting_team := case when random() < 0.5 then 'red' else 'blue' end;
+  v_other_team    := case when v_starting_team = 'red' then 'blue' else 'red' end;
+
+  insert into cr_games (lobby_id, starting_team, current_team)
+  values (v_lobby_id, v_starting_team, v_starting_team)
+  returning id into v_game_id;
+
+  -- Build a shuffled 25-element type array: 9 starting, 8 other, 7 neutral, 1 assassin.
+  v_types := array(
+    select t from (
+      select v_starting_team as t from generate_series(1,9)
+      union all
+      select v_other_team     from generate_series(1,8)
+      union all
+      select 'neutral'        from generate_series(1,7)
+      union all
+      select 'assassin'
+    ) s order by random()
+  );
+
+  select array_agg(id order by random()) into v_signs
+    from (select id from signs order by random() limit 25) s;
+
+  for i in 0..24 loop
+    insert into cr_cards (game_id, position, sign_id, card_type)
+    values (v_game_id, i, v_signs[i+1], v_types[i+1]);
+  end loop;
+
+  update cr_lobbies set status = 'in_game' where id = v_lobby_id;
+
+  return v_game_id;
+end $$;
+
+create or replace function cr_play_again(p_code text, p_player_token text)
+returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_lobby_id uuid;
+  v_caller_exists boolean;
+  v_latest_status text;
+begin
+  select id into v_lobby_id from cr_lobbies where code = p_code;
+  if v_lobby_id is null then
+    raise exception 'Lobby not found';
+  end if;
+
+  select exists(
+    select 1 from cr_players where lobby_id = v_lobby_id and player_token = p_player_token
+  ) into v_caller_exists;
+  if not v_caller_exists then
+    raise exception 'You are not in this lobby';
+  end if;
+
+  select status into v_latest_status from cr_games
+    where lobby_id = v_lobby_id order by created_at desc limit 1;
+  if v_latest_status = 'in_progress' then
+    raise exception 'Current game still in progress';
+  end if;
+
+  update cr_lobbies set status = 'lobby' where id = v_lobby_id;
+  update cr_players set is_spymaster = false where lobby_id = v_lobby_id;
+end $$;
