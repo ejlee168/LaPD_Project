@@ -16,7 +16,8 @@ create table cr_players (
   is_spymaster boolean not null default false,
   joined_at timestamptz not null default now(),
   last_seen timestamptz not null default now(),
-  unique(lobby_id, player_token)
+  unique(lobby_id, player_token),
+  unique(lobby_id, nickname)
 );
 
 create table cr_games (

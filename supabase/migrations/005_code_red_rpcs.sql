@@ -56,12 +56,16 @@ begin
     raise exception 'Lobby not found';
   end if;
 
-  insert into cr_players (lobby_id, player_token, nickname)
-  values (v_lobby_id, p_player_token, p_nickname)
-  on conflict (lobby_id, player_token) do update
-    set nickname = excluded.nickname,
-        last_seen = now()
-  returning id into v_player_id;
+  begin
+    insert into cr_players (lobby_id, player_token, nickname)
+    values (v_lobby_id, p_player_token, p_nickname)
+    on conflict (lobby_id, player_token) do update
+      set nickname = excluded.nickname,
+          last_seen = now()
+    returning id into v_player_id;
+  exception when unique_violation then
+    raise exception 'Nickname already taken in this lobby';
+  end;
 
   return v_player_id;
 end $$;
