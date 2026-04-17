@@ -11,6 +11,7 @@ import { canStartGame } from "@/lib/code-red/rules";
 import { LobbyHeader } from "@/components/code-red/lobby-header";
 import { TeamPanel } from "@/components/code-red/team-panel";
 import { SpectatorList } from "@/components/code-red/spectator-list";
+import { GameBoard } from "@/components/code-red/game-board";
 import { Button } from "@/components/ui/button";
 import type { CrLobby, CrPlayer, CrGame, CrCard } from "@/lib/code-red/types";
 
@@ -152,7 +153,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
           </div>
         </>
       ) : (
-        <p className="text-center text-muted-foreground text-sm">Game board coming in Task 14.</p>
+        <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
       )}
     </div>
   );
