@@ -49,6 +49,7 @@ export function subscribeToPresence(
   token: string,
   nickname: string,
   onSync: (onlineTokens: Set<string>) => void,
+  onPeerLeave?: (leftToken: string) => void,
 ): Unsub {
   const supabase: SupabaseClient = createClient();
   const channel = supabase.channel(`cr-presence-${code}`, {
@@ -59,6 +60,10 @@ export function subscribeToPresence(
     const state = channel.presenceState();
     const online = new Set(Object.keys(state));
     onSync(online);
+  });
+
+  channel.on("presence", { event: "leave" }, ({ key }: { key: string }) => {
+    if (key && key !== token) onPeerLeave?.(key);
   });
 
   channel.subscribe(async (status) => {

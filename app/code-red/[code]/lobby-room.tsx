@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { subscribeToLobby, subscribeToGame, subscribeToPresence } from "@/lib/code-red/realtime";
 import { getOrCreatePlayerToken } from "@/lib/code-red/player-token";
-import { joinLobby, startGame, playAgain } from "@/lib/code-red/client";
+import { joinLobby, startGame, playAgain, leaveLobby } from "@/lib/code-red/client";
 import { canStartGame } from "@/lib/code-red/rules";
 import { LobbyHeader } from "@/components/code-red/lobby-header";
 import { TeamPanel } from "@/components/code-red/team-panel";
@@ -114,9 +114,37 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
 
   useEffect(() => {
     if (!token || !me) return;
-    const unsub = subscribeToPresence(lobby.code, token, me.nickname, setOnline);
+    const unsub = subscribeToPresence(
+      lobby.code,
+      token,
+      me.nickname,
+      setOnline,
+      (leftToken) => { void leaveLobby(lobby.code, leftToken).catch(() => {}); },
+    );
     return unsub;
   }, [lobby.code, token, me]);
+
+  // Best-effort cleanup when the last player closes their tab — survivors
+  // handle the presence-leave case; this covers the final player.
+  useEffect(() => {
+    if (!token || !me) return;
+    function onUnload() {
+      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/cr_remove_from_lobby`;
+      const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({ p_code: lobby.code, p_player_token: token }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+    window.addEventListener("pagehide", onUnload);
+    return () => window.removeEventListener("pagehide", onUnload);
+  }, [token, me, lobby.code]);
 
   useEffect(() => {
     if (!token) return;
@@ -135,7 +163,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
   }, [token, me, lobby.code, router, refetchLobbyState]);
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
+    <div className="space-y-4 max-w-xl mx-auto">
       <LobbyHeader code={lobby.code} me={me} token={token} />
       {lobby.status !== "in_game" ? (
         <>
@@ -145,7 +173,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
             </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
-            <TeamPanel code={lobby.code} token={token} team="red"  players={players} me={me} online={online} />
+            <TeamPanel code={lobby.code} token={token} team="red" players={players} me={me} online={online} />
             <TeamPanel code={lobby.code} token={token} team="blue" players={players} me={me} online={online} />
           </div>
           <SpectatorList players={players} online={online} />

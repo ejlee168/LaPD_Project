@@ -52,6 +52,13 @@ export async function kickPlayer(code: string, token: string, targetId: string):
   if (error) throw new Error(error.message);
 }
 
+export async function leaveLobby(code: string, token: string): Promise<void> {
+  const { error } = await db().rpc("cr_remove_from_lobby", {
+    p_code: code, p_player_token: token,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export async function startGame(code: string, token: string): Promise<string> {
   return unwrap(await db().rpc("cr_start_game", {
     p_code: code, p_player_token: token,

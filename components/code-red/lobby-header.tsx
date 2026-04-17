@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { LuCopy, LuLogOut } from "react-icons/lu";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { kickPlayer } from "@/lib/code-red/client";
+import { leaveLobby } from "@/lib/code-red/client";
 import type { CrPlayer } from "@/lib/code-red/types";
 
 interface Props {
@@ -28,7 +28,7 @@ export function LobbyHeader({ code, me, token }: Props) {
   async function leave() {
     if (!me) { router.push("/code-red"); return; }
     try {
-      await kickPlayer(code, token, me.id);
+      await leaveLobby(code, token);
     } catch (e) {
       toast.error((e as Error).message);
       return;
