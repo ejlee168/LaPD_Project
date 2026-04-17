@@ -112,17 +112,19 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
     return unsub;
   }, [game, refetchCards, refetchActions]);
 
+  const myNickname = me?.nickname ?? "";
+  const iAmInLobby = !!me;
   useEffect(() => {
-    if (!token || !me) return;
+    if (!token || !iAmInLobby) return;
     const unsub = subscribeToPresence(
       lobby.code,
       token,
-      me.nickname,
+      myNickname,
       setOnline,
       (leftToken) => { void leaveLobby(lobby.code, leftToken).catch(() => {}); },
     );
     return unsub;
-  }, [lobby.code, token, me]);
+  }, [lobby.code, token, iAmInLobby, myNickname]);
 
   useEffect(() => {
     if (!token) return;
