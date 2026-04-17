@@ -14,8 +14,9 @@ import { SpectatorList } from "@/components/code-red/spectator-list";
 import { GameBoard } from "@/components/code-red/game-board";
 import { TurnBanner } from "@/components/code-red/turn-banner";
 import { ClueForm } from "@/components/code-red/clue-form";
+import { ActionLog } from "@/components/code-red/action-log";
 import { Button } from "@/components/ui/button";
-import type { CrLobby, CrPlayer, CrGame, CrCard } from "@/lib/code-red/types";
+import type { CrLobby, CrPlayer, CrGame, CrCard, CrAction } from "@/lib/code-red/types";
 
 interface Props {
   initialLobby: CrLobby;
@@ -40,6 +41,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
   const [players, setPlayers] = useState(initialPlayers);
   const [game, setGame] = useState(initialGame);
   const [cards, setCards] = useState(initialCards);
+  const [actions, setActions] = useState<CrAction[]>([]);
   const [online, setOnline] = useState<Set<string>>(new Set());
   const [token, setToken] = useState<string>("");
 
@@ -86,12 +88,26 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
     return unsub;
   }, [lobby.id, refetchLobbyState]);
 
+  const refetchActions = useCallback(async (gameId: string) => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("cr_actions")
+      .select("id, game_id, player_id, action_type, payload, created_at")
+      .eq("game_id", gameId)
+      .order("created_at", { ascending: true });
+    setActions((data ?? []) as CrAction[]);
+  }, []);
+
   useEffect(() => {
-    if (!game) return;
+    if (!game) { setActions([]); return; }
     void refetchCards(game.id);
-    const unsub = subscribeToGame(game.id, () => { void refetchCards(game.id); });
+    void refetchActions(game.id);
+    const unsub = subscribeToGame(game.id, () => {
+      void refetchCards(game.id);
+      void refetchActions(game.id);
+    });
     return unsub;
-  }, [game, refetchCards]);
+  }, [game, refetchCards, refetchActions]);
 
   useEffect(() => {
     if (!token || !me) return;
@@ -159,6 +175,10 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
           <TurnBanner game={game} />
           <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
           <ClueForm code={lobby.code} token={token} me={me} game={game} />
+          <ActionLog
+            actions={actions}
+            nicknameByPlayerId={Object.fromEntries(players.map((p) => [p.id, p.nickname]))}
+          />
         </div>
       )}
     </div>
