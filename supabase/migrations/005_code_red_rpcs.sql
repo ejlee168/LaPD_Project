@@ -273,3 +273,187 @@ begin
   update cr_lobbies set status = 'lobby' where id = v_lobby_id;
   update cr_players set is_spymaster = false where lobby_id = v_lobby_id;
 end $$;
+
+-- ---------------------------------------------------------------------------
+-- Turn actions
+-- ---------------------------------------------------------------------------
+
+create or replace function cr_submit_clue(
+  p_code text, p_player_token text, p_word text, p_count int
+) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_lobby_id uuid;
+  v_player_id uuid;
+  v_player_team text;
+  v_is_spy boolean;
+  v_game_id uuid;
+  v_current_team text;
+  v_current_clue text;
+begin
+  if p_count < 1 then
+    raise exception 'Clue count must be >= 1';
+  end if;
+
+  select id into v_lobby_id from cr_lobbies where code = p_code;
+  if v_lobby_id is null then raise exception 'Lobby not found'; end if;
+
+  select id, team, is_spymaster into v_player_id, v_player_team, v_is_spy
+    from cr_players where lobby_id = v_lobby_id and player_token = p_player_token;
+  if v_player_id is null then raise exception 'You are not in this lobby'; end if;
+
+  select id, current_team, current_clue_word into v_game_id, v_current_team, v_current_clue
+    from cr_games where lobby_id = v_lobby_id and status = 'in_progress'
+    order by created_at desc limit 1;
+  if v_game_id is null then raise exception 'No active game'; end if;
+  if v_current_clue is not null then raise exception 'A clue is already active'; end if;
+  if not v_is_spy or v_player_team <> v_current_team then
+    raise exception 'Only the current team''s spymaster can submit a clue';
+  end if;
+
+  update cr_games
+    set current_clue_word = p_word,
+        current_clue_count = p_count,
+        guesses_remaining = p_count + 1
+    where id = v_game_id;
+
+  insert into cr_actions (game_id, player_id, action_type, payload)
+  values (v_game_id, v_player_id, 'clue', jsonb_build_object('word', p_word, 'count', p_count));
+end $$;
+
+create or replace function cr_end_turn(p_code text, p_player_token text)
+returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_lobby_id uuid;
+  v_player_id uuid;
+  v_player_team text;
+  v_is_spy boolean;
+  v_game_id uuid;
+  v_current_team text;
+  v_next_team text;
+begin
+  select id into v_lobby_id from cr_lobbies where code = p_code;
+  if v_lobby_id is null then raise exception 'Lobby not found'; end if;
+
+  select id, team, is_spymaster into v_player_id, v_player_team, v_is_spy
+    from cr_players where lobby_id = v_lobby_id and player_token = p_player_token;
+  if v_player_id is null then raise exception 'You are not in this lobby'; end if;
+
+  select id, current_team into v_game_id, v_current_team
+    from cr_games where lobby_id = v_lobby_id and status = 'in_progress'
+    order by created_at desc limit 1;
+  if v_game_id is null then raise exception 'No active game'; end if;
+  if v_is_spy or v_player_team <> v_current_team then
+    raise exception 'Only an operative on the current team may end the turn';
+  end if;
+
+  v_next_team := case when v_current_team = 'red' then 'blue' else 'red' end;
+  update cr_games
+    set current_team = v_next_team,
+        current_clue_word = null,
+        current_clue_count = null,
+        guesses_remaining = null
+    where id = v_game_id;
+
+  insert into cr_actions (game_id, player_id, action_type)
+  values (v_game_id, v_player_id, 'end_turn');
+end $$;
+
+create or replace function cr_reveal_card(
+  p_code text, p_player_token text, p_position int
+) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_lobby_id uuid;
+  v_player_id uuid;
+  v_player_team text;
+  v_is_spy boolean;
+  v_game_id uuid;
+  v_current_team text;
+  v_starting_team text;
+  v_other_team text;
+  v_clue text;
+  v_guesses int;
+  v_card_id uuid;
+  v_card_type text;
+  v_already_revealed boolean;
+  v_revealed_own int;
+  v_own_total int;
+  v_next_team text;
+begin
+  select id into v_lobby_id from cr_lobbies where code = p_code;
+  if v_lobby_id is null then raise exception 'Lobby not found'; end if;
+
+  select id, team, is_spymaster into v_player_id, v_player_team, v_is_spy
+    from cr_players where lobby_id = v_lobby_id and player_token = p_player_token;
+  if v_player_id is null then raise exception 'You are not in this lobby'; end if;
+
+  select id, current_team, starting_team, current_clue_word, guesses_remaining
+    into v_game_id, v_current_team, v_starting_team, v_clue, v_guesses
+    from cr_games where lobby_id = v_lobby_id and status = 'in_progress'
+    order by created_at desc limit 1;
+  if v_game_id is null then raise exception 'No active game'; end if;
+  if v_clue is null then raise exception 'No active clue'; end if;
+  if v_is_spy or v_player_team <> v_current_team then
+    raise exception 'Only an operative on the current team may reveal';
+  end if;
+
+  select id, card_type, revealed into v_card_id, v_card_type, v_already_revealed
+    from cr_cards where game_id = v_game_id and position = p_position;
+  if v_card_id is null then raise exception 'Invalid card position'; end if;
+  if v_already_revealed then raise exception 'Card already revealed'; end if;
+
+  update cr_cards set revealed = true where id = v_card_id;
+  insert into cr_actions (game_id, player_id, action_type, payload)
+  values (v_game_id, v_player_id, 'reveal',
+          jsonb_build_object('position', p_position, 'card_type', v_card_type));
+
+  v_other_team := case when v_current_team = 'red' then 'blue' else 'red' end;
+
+  if v_card_type = 'assassin' then
+    update cr_games set status = v_other_team || '_win', ended_at = now(),
+      current_clue_word = null, current_clue_count = null, guesses_remaining = null
+      where id = v_game_id;
+    update cr_lobbies set status = 'finished' where id = v_lobby_id;
+    insert into cr_actions (game_id, action_type, payload)
+    values (v_game_id, 'game_end', jsonb_build_object('reason', 'assassin', 'winner', v_other_team));
+    return;
+  end if;
+
+  if v_card_type = 'neutral' or v_card_type = v_other_team then
+    v_next_team := v_other_team;
+    update cr_games
+      set current_team = v_next_team,
+          current_clue_word = null,
+          current_clue_count = null,
+          guesses_remaining = null
+      where id = v_game_id;
+    return;
+  end if;
+
+  -- Own-color branch.
+  v_own_total := case when v_current_team = v_starting_team then 9 else 8 end;
+  select count(*) into v_revealed_own
+    from cr_cards where game_id = v_game_id and card_type = v_current_team and revealed;
+
+  if v_revealed_own >= v_own_total then
+    update cr_games set status = v_current_team || '_win', ended_at = now(),
+      current_clue_word = null, current_clue_count = null, guesses_remaining = null
+      where id = v_game_id;
+    update cr_lobbies set status = 'finished' where id = v_lobby_id;
+    insert into cr_actions (game_id, action_type, payload)
+    values (v_game_id, 'game_end', jsonb_build_object('reason', 'cleared', 'winner', v_current_team));
+    return;
+  end if;
+
+  update cr_games set guesses_remaining = v_guesses - 1 where id = v_game_id;
+  if v_guesses - 1 <= 0 then
+    update cr_games
+      set current_team = v_other_team,
+          current_clue_word = null,
+          current_clue_count = null,
+          guesses_remaining = null
+      where id = v_game_id;
+  end if;
+end $$;

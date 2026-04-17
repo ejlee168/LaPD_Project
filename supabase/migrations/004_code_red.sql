@@ -45,7 +45,7 @@ create table cr_cards (
 create table cr_actions (
   id uuid primary key default gen_random_uuid(),
   game_id uuid not null references cr_games(id) on delete cascade,
-  player_id uuid references cr_players(id),
+  player_id uuid references cr_players(id) on delete set null,
   action_type text not null,                 -- 'clue' | 'reveal' | 'end_turn' | 'game_end'
   payload jsonb,
   created_at timestamptz not null default now()
