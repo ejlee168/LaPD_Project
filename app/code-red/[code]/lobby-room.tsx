@@ -12,6 +12,8 @@ import { LobbyHeader } from "@/components/code-red/lobby-header";
 import { TeamPanel } from "@/components/code-red/team-panel";
 import { SpectatorList } from "@/components/code-red/spectator-list";
 import { GameBoard } from "@/components/code-red/game-board";
+import { TurnBanner } from "@/components/code-red/turn-banner";
+import { ClueForm } from "@/components/code-red/clue-form";
 import { Button } from "@/components/ui/button";
 import type { CrLobby, CrPlayer, CrGame, CrCard } from "@/lib/code-red/types";
 
@@ -153,7 +155,11 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
           </div>
         </>
       ) : (
-        <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
+        <div className="space-y-3">
+          <TurnBanner game={game} />
+          <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
+          <ClueForm code={lobby.code} token={token} me={me} game={game} />
+        </div>
       )}
     </div>
   );
