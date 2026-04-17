@@ -126,9 +126,19 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
     return unsub;
   }, [lobby.code, token, iAmInLobby, myNickname]);
 
+  const [hasJoined, setHasJoined] = useState(false);
+  useEffect(() => { if (me) setHasJoined(true); }, [me]);
+
   useEffect(() => {
     if (!token) return;
     if (me) return;
+    // Previously in this lobby but now removed (leave, kick, sweep).
+    // Don't re-prompt — drop them back to the landing page.
+    if (hasJoined) {
+      router.push("/code-red");
+      return;
+    }
+    // Deep link: never joined this lobby; ask for a nickname.
     const nickname = window.prompt("Nickname for this lobby?");
     if (!nickname) {
       router.push("/code-red");
@@ -140,7 +150,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
         toast.error((e as Error).message);
         router.push("/code-red");
       });
-  }, [token, me, lobby.code, router, refetchLobbyState]);
+  }, [token, me, hasJoined, lobby.code, router, refetchLobbyState]);
 
   return (
     <div className="space-y-4 max-w-xl mx-auto">
