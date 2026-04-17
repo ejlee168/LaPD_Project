@@ -124,28 +124,6 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
     return unsub;
   }, [lobby.code, token, me]);
 
-  // Best-effort cleanup when the last player closes their tab — survivors
-  // handle the presence-leave case; this covers the final player.
-  useEffect(() => {
-    if (!token || !me) return;
-    function onUnload() {
-      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/cr_remove_from_lobby`;
-      const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: key,
-          Authorization: `Bearer ${key}`,
-        },
-        body: JSON.stringify({ p_code: lobby.code, p_player_token: token }),
-        keepalive: true,
-      }).catch(() => {});
-    }
-    window.addEventListener("pagehide", onUnload);
-    return () => window.removeEventListener("pagehide", onUnload);
-  }, [token, me, lobby.code]);
-
   useEffect(() => {
     if (!token) return;
     if (me) return;
