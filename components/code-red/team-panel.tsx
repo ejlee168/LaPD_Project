@@ -51,6 +51,9 @@ export function TeamPanel({ code, token, team, players, me, online }: Props) {
                 )}
               />
               <span>{p.nickname}</span>
+              {p.id === me?.id && (
+                <span className="text-xs text-muted-foreground">(you)</span>
+              )}
               {p.is_spymaster && (
                 <span className="text-xs rounded bg-foreground/10 px-1.5 py-0.5">spy</span>
               )}

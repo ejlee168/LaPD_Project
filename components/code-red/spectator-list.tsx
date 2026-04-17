@@ -6,9 +6,10 @@ import type { CrPlayer } from "@/lib/code-red/types";
 interface Props {
   players: CrPlayer[];
   online: Set<string>;
+  me: CrPlayer | null;
 }
 
-export function SpectatorList({ players, online }: Props) {
+export function SpectatorList({ players, online, me }: Props) {
   const spectators = players.filter((p) => p.team === null);
   if (spectators.length === 0) return null;
   return (
@@ -23,7 +24,10 @@ export function SpectatorList({ players, online }: Props) {
               "inline-block size-2 rounded-full",
               online.has(p.player_token) ? "bg-emerald-500" : "bg-muted-foreground/40",
             )} />
-            {p.nickname}
+            <span>{p.nickname}</span>
+            {p.id === me?.id && (
+              <span className="text-xs text-muted-foreground">(you)</span>
+            )}
           </li>
         ))}
       </ul>

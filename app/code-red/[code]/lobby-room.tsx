@@ -166,7 +166,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
             <TeamPanel code={lobby.code} token={token} team="red" players={players} me={me} online={online} />
             <TeamPanel code={lobby.code} token={token} team="blue" players={players} me={me} online={online} />
           </div>
-          <SpectatorList players={players} online={online} />
+          <SpectatorList players={players} online={online} me={me} />
           <div className="flex justify-center gap-2">
             {lobby.status === "lobby" && (
               <Button
