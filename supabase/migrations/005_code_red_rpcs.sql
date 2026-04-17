@@ -87,7 +87,7 @@ begin
 
   update cr_players
     set team = p_team,
-        is_spymaster = case when p_team is null then false else is_spymaster end,
+        is_spymaster = case when p_team is distinct from team then false else is_spymaster end,
         last_seen = now()
     where lobby_id = v_lobby_id and player_token = p_player_token;
 end $$;
