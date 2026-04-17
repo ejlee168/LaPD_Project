@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { subscribeToLobby, subscribeToGame, subscribeToPresence } from "@/lib/code-red/realtime";
 import { getOrCreatePlayerToken } from "@/lib/code-red/player-token";
 import { joinLobby } from "@/lib/code-red/client";
+import { LobbyHeader } from "@/components/code-red/lobby-header";
 import type { CrLobby, CrPlayer, CrGame, CrCard } from "@/lib/code-red/types";
 
 interface Props {
@@ -109,12 +110,10 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
 
   return (
     <div className="space-y-4 max-w-4xl mx-auto">
-      <div className="text-center">
-        <p className="font-mono text-3xl tracking-widest">{lobby.code}</p>
-        <p className="text-xs text-muted-foreground">
-          status: {lobby.status} · online: {online.size} · players: {players.length}
-        </p>
-      </div>
+      <LobbyHeader code={lobby.code} me={me} token={token} />
+      <p className="text-xs text-muted-foreground text-center">
+        status: {lobby.status} · online: {online.size} · players: {players.length}
+      </p>
       <p className="text-center text-muted-foreground text-sm">
         Lobby / Game UI coming in next tasks.{" "}
         {game ? `Latest game: ${game.status}` : "No game yet."}
