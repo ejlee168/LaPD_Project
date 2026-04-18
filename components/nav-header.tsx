@@ -10,6 +10,9 @@ import { SettingsDrawer } from "@/components/settings-drawer";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useSoundEnabled } from "@/components/sound-provider";
+import { Button } from "@/components/ui/button"
+import { FaQuestion } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 const THEME_ORDER = ["light", "dark", "system"] as const;
 
@@ -18,6 +21,7 @@ export function NavHeader() {
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const shuffleRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter()
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -73,7 +77,6 @@ export function NavHeader() {
         </div>
         <nav className="flex items-center gap-3 sm:gap-5">
           <Link data-no-click-sound href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">cases</Link>
-          <Link data-no-click-sound href="/code-red" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">code red</Link>
           <Link data-no-click-sound href="/anki" className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">anki</Link>
           <Tooltip>
             <TooltipTrigger render={<span />}>
@@ -103,6 +106,16 @@ export function NavHeader() {
                 <KbdGroup><Kbd>⇧</Kbd><Kbd>R</Kbd></KbdGroup>
               </TooltipContent>
             </Tooltip>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground"
+              aria-label={"code-red-link"}
+              data-no-click-sound
+              onClick={() => router.push("/code-red")}
+            >
+              <FaQuestion />
+            </Button>
           </div>
         </nav>
       </div>
