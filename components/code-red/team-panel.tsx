@@ -36,7 +36,7 @@ export function TeamPanel({ code, token, team, players, me, online }: Props) {
 
   return (
     <Card className={cn("ring-2", accent)}>
-      <CardHeader><CardTitle>{label} ({onTeam.length})</CardTitle></CardHeader>
+      <CardHeader><CardTitle>{label}</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         <ul className="space-y-1">
           {onTeam.length === 0 && (

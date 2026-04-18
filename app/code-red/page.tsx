@@ -47,21 +47,24 @@ export default function CodeRedLandingPage() {
   }
 
   return (
-    <FadeIn className="max-w-md mx-auto space-y-6">
+    <FadeIn className="max-w-xl mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">🕵️ Code Red</h1>
-        <p className="text-muted-foreground">Codenames with your friends</p>
+        <h1 className="text-2xl font-bold">Code Red</h1>
+        <p className="text-muted-foreground">medical codenames</p>
       </div>
       <Card>
-        <CardHeader><CardTitle>Nickname</CardTitle></CardHeader>
+        <CardTitle className="sr-only">Nickname</CardTitle>
         <CardContent>
-          <Input
-            placeholder="Pick a nickname"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            maxLength={24}
-            autoFocus
-          />
+          <div className="flex flex-row items-center gap-2">
+            <p className="text-base leading-snug font-medium">Nickname</p>
+            <Input
+              placeholder="John Smith"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              maxLength={24}
+              autoFocus
+            />
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -75,16 +78,19 @@ export default function CodeRedLandingPage() {
         </Card>
         <Card>
           <CardHeader><CardTitle>Join lobby</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            <Input
-              placeholder="6-char code"
-              value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              maxLength={6}
-            />
-            <Button disabled={busy} onClick={handleJoin} className="w-full">
-              Join
-            </Button>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                placeholder="XXXXXX"
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                maxLength={6}
+                className="flex-1 text-center placeholder:text-center tracking-widest font-mono"
+              />
+              <Button disabled={busy} onClick={handleJoin}>
+                Join
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
