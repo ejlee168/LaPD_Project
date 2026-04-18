@@ -22,7 +22,7 @@ export function ClueForm({ code, token, me, game }: Props) {
   const canEndTurn = isYourTurnToGuess(game, me);
 
   async function handleSubmit() {
-    const w = word.trim();
+    const w = word.replace(/\s+/g, "").toUpperCase();
     const n = parseInt(count, 10);
     if (!w) return toast.error("Enter a clue word");
     if (!Number.isFinite(n) || n < 1) return toast.error("Count must be >= 1");
@@ -44,10 +44,10 @@ export function ClueForm({ code, token, me, game }: Props) {
     return (
       <div className="flex gap-2">
         <Input
-          className="flex-1"
-          placeholder="Clue word"
+          className="flex-1 uppercase tracking-wide"
+          placeholder="CLUE"
           value={word}
-          onChange={(e) => setWord(e.target.value)}
+          onChange={(e) => setWord(e.target.value.replace(/\s+/g, "").toUpperCase())}
           maxLength={40}
         />
         <Input
