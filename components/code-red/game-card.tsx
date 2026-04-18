@@ -29,15 +29,16 @@ export function GameCard({ card, spymasterView, canClick, onClick }: Props) {
       onClick={canClick && !revealed ? onClick : undefined}
       disabled={!canClick || revealed}
       className={cn(
-        "aspect-4/3 rounded-lg border px-2 py-1.5 font-medium transition-all overflow-hidden",
+        "aspect-4/3 rounded-lg border font-medium transition-all overflow-hidden",
+        "flex items-center justify-center p-2",
         showColor ? bgForType(card.card_type) : "bg-card border-border",
-        revealed && "opacity-70 line-through",
+        revealed && "opacity-70",
         canClick && !revealed && "hover:-translate-y-0.5 hover:shadow cursor-pointer",
         !canClick && !revealed && "cursor-default",
       )}
       aria-label={`card ${card.position + 1}${revealed ? " revealed" : ""}`}
     >
-      <AutoFitText text={card.sign_name ?? `#${card.position}`} />
+      {!revealed && <AutoFitText text={card.sign_name ?? `#${card.position}`} />}
     </button>
   );
 }

@@ -196,11 +196,11 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
           const nicknameByPlayerId = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
           return (
             <div className="space-y-3">
-              <TurnBanner game={game} />
+              <TurnBanner game={game} cards={cards} />
               <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
               <ClueForm code={lobby.code} token={token} me={me} game={game} />
               <div className="hidden sm:block">
-                <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} />
+                <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} cards={cards} />
               </div>
               <div className="sm:hidden">
                 <Drawer>
@@ -212,7 +212,7 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
                   <DrawerContent>
                     <DrawerHeader><DrawerTitle>Action log</DrawerTitle></DrawerHeader>
                     <div className="p-4">
-                      <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} />
+                      <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} cards={cards} />
                     </div>
                   </DrawerContent>
                 </Drawer>
