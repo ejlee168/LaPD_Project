@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { AutoFitText } from "@/components/code-red/auto-fit-text";
 import type { CrCard, CardType } from "@/lib/code-red/types";
 
 interface Props {
@@ -28,8 +29,7 @@ export function GameCard({ card, spymasterView, canClick, onClick }: Props) {
       onClick={canClick && !revealed ? onClick : undefined}
       disabled={!canClick || revealed}
       className={cn(
-        "aspect-4/3 rounded-lg border px-2 py-1.5 text-center text-sm font-medium transition-all",
-        "flex items-center justify-center leading-tight",
+        "aspect-4/3 rounded-lg border px-2 py-1.5 font-medium transition-all overflow-hidden",
         showColor ? bgForType(card.card_type) : "bg-card border-border",
         revealed && "opacity-70 line-through",
         canClick && !revealed && "hover:-translate-y-0.5 hover:shadow cursor-pointer",
@@ -37,7 +37,7 @@ export function GameCard({ card, spymasterView, canClick, onClick }: Props) {
       )}
       aria-label={`card ${card.position + 1}${revealed ? " revealed" : ""}`}
     >
-      <span className="truncate">{card.sign_name ?? `#${card.position}`}</span>
+      <AutoFitText text={card.sign_name ?? `#${card.position}`} />
     </button>
   );
 }
