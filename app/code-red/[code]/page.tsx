@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LobbyRoom } from "./lobby-room";
+import LobbyNotFound from "./lobby-not-found";
 import type { CrLobby, CrPlayer, CrGame, CrCard } from "@/lib/code-red/types";
 
 export async function generateMetadata({
@@ -36,7 +36,7 @@ export default async function CodeRedLobbyPage({
     .select("id, code, status, created_at")
     .eq("code", upper)
     .single<CrLobby>();
-  if (!lobby) notFound();
+  if (!lobby) return <LobbyNotFound />;
 
   const { data: players } = await supabase
     .from("cr_players")
