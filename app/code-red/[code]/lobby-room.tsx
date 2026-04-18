@@ -155,72 +155,74 @@ export function LobbyRoom({ initialLobby, initialPlayers, initialGame, initialCa
   return (
     <div className="space-y-4 max-w-xl mx-auto">
       <LobbyHeader code={lobby.code} me={me} token={token} />
-      {lobby.status !== "in_game" ? (
-        <>
-          {lobby.status === "finished" && game && (
-            <div className="rounded-lg border px-4 py-2 text-sm text-center">
-              Last game: <span className="font-medium">{game.status.replace("_", " ")}</span>
-            </div>
-          )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <TeamPanel code={lobby.code} token={token} team="red" players={players} me={me} online={online} />
-            <TeamPanel code={lobby.code} token={token} team="blue" players={players} me={me} online={online} />
-          </div>
-          <SpectatorList players={players} online={online} me={me} />
-          <div className="flex justify-center gap-2">
-            {lobby.status === "lobby" && (
-              <Button
-                disabled={!canStartGame(players)}
-                onClick={async () => {
-                  try { await startGame(lobby.code, token); }
-                  catch (e) { toast.error((e as Error).message); }
-                }}
-              >
-                Start game
-              </Button>
-            )}
-            {lobby.status === "finished" && (
-              <Button
-                onClick={async () => {
-                  try { await playAgain(lobby.code, token); }
-                  catch (e) { toast.error((e as Error).message); }
-                }}
-              >
-                Play again
-              </Button>
-            )}
-          </div>
-        </>
-      ) : (
-        (() => {
-          const nicknameByPlayerId = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
-          return (
-            <div className="space-y-3">
-              <TurnBanner game={game} cards={cards} />
-              <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
-              <ClueForm code={lobby.code} token={token} me={me} game={game} />
-              <div className="hidden sm:block">
-                <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} cards={cards} />
+      {(() => {
+        const nicknameByPlayerId = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
+        const showGameView = !!game && (lobby.status === "in_game" || lobby.status === "finished");
+        const showLobbyControls = lobby.status !== "in_game";
+        return (
+          <>
+            {showGameView && (
+              <div className="space-y-3">
+                <TurnBanner game={game} cards={cards} />
+                <GameBoard code={lobby.code} token={token} me={me} game={game} cards={cards} />
+                {lobby.status === "in_game" && (
+                  <ClueForm code={lobby.code} token={token} me={me} game={game} />
+                )}
+                <div className="hidden sm:block">
+                  <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} cards={cards} />
+                </div>
+                <div className="sm:hidden">
+                  <Drawer>
+                    <DrawerTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-full">
+                        Show log ({actions.length})
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <DrawerHeader><DrawerTitle>Action log</DrawerTitle></DrawerHeader>
+                      <div className="p-4">
+                        <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} cards={cards} />
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                </div>
               </div>
-              <div className="sm:hidden">
-                <Drawer>
-                  <DrawerTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Show log ({actions.length})
+            )}
+            {showLobbyControls && (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <TeamPanel code={lobby.code} token={token} team="red" players={players} me={me} online={online} />
+                  <TeamPanel code={lobby.code} token={token} team="blue" players={players} me={me} online={online} />
+                </div>
+                <SpectatorList players={players} online={online} me={me} />
+                <div className="flex justify-center gap-2">
+                  {lobby.status === "lobby" && (
+                    <Button
+                      disabled={!canStartGame(players)}
+                      onClick={async () => {
+                        try { await startGame(lobby.code, token); }
+                        catch (e) { toast.error((e as Error).message); }
+                      }}
+                    >
+                      Start game
                     </Button>
-                  </DrawerTrigger>
-                  <DrawerContent>
-                    <DrawerHeader><DrawerTitle>Action log</DrawerTitle></DrawerHeader>
-                    <div className="p-4">
-                      <ActionLog actions={actions} nicknameByPlayerId={nicknameByPlayerId} cards={cards} />
-                    </div>
-                  </DrawerContent>
-                </Drawer>
-              </div>
-            </div>
-          );
-        })()
-      )}
+                  )}
+                  {lobby.status === "finished" && (
+                    <Button
+                      onClick={async () => {
+                        try { await playAgain(lobby.code, token); }
+                        catch (e) { toast.error((e as Error).message); }
+                      }}
+                    >
+                      Play again
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        );
+      })()}
     </div>
   );
 }

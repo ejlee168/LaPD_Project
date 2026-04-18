@@ -17,6 +17,7 @@ interface Props {
 export function GameBoard({ code, token, me, game, cards }: Props) {
   const spymasterView = !!me?.is_spymaster;
   const canGuess = isYourTurnToGuess(game, me);
+  const gameOver = !!game && game.status !== "in_progress";
 
   async function click(position: number) {
     try { await revealCard(code, token, position); }
@@ -33,6 +34,7 @@ export function GameBoard({ code, token, me, game, cards }: Props) {
           card={c}
           spymasterView={spymasterView}
           canClick={canGuess}
+          revealAll={gameOver}
           onClick={() => click(c.position)}
         />
       ))}

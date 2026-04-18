@@ -8,6 +8,7 @@ interface Props {
   card: CrCard;
   spymasterView: boolean;
   canClick: boolean;
+  revealAll?: boolean;
   onClick?: () => void;
 }
 
@@ -20,9 +21,9 @@ function bgForType(t: CardType): string {
   }
 }
 
-export function GameCard({ card, spymasterView, canClick, onClick }: Props) {
+export function GameCard({ card, spymasterView, canClick, revealAll, onClick }: Props) {
   const revealed = card.revealed;
-  const showColor = revealed || spymasterView;
+  const showColor = revealed || spymasterView || !!revealAll;
   return (
     <button
       type="button"
