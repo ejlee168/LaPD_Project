@@ -24,6 +24,8 @@ function bgForType(t: CardType): string {
 export function GameCard({ card, spymasterView, canClick, revealAll, onClick }: Props) {
   const revealed = card.revealed;
   const showColor = revealed || spymasterView || !!revealAll;
+  const showText = !revealed || !!revealAll;
+  const boldText = !!revealAll && !revealed;
   return (
     <button
       type="button"
@@ -33,13 +35,19 @@ export function GameCard({ card, spymasterView, canClick, revealAll, onClick }: 
         "aspect-4/3 rounded-lg border font-medium transition-all overflow-hidden",
         "flex items-center justify-center p-2",
         showColor ? bgForType(card.card_type) : "bg-card border-border",
-        revealed && "opacity-70",
+        revealed && !revealAll && "opacity-70",
+        revealed && revealAll && "opacity-60",
         canClick && !revealed && "hover:-translate-y-0.5 hover:shadow cursor-pointer",
         !canClick && !revealed && "cursor-default",
       )}
       aria-label={`card ${card.position + 1}${revealed ? " revealed" : ""}`}
     >
-      {!revealed && <AutoFitText text={card.sign_name ?? `#${card.position}`} />}
+      {showText && (
+        <AutoFitText
+          text={card.sign_name ?? `#${card.position}`}
+          className={boldText ? "font-bold" : undefined}
+        />
+      )}
     </button>
   );
 }
