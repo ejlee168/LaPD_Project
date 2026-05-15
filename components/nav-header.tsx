@@ -43,6 +43,7 @@ export function NavHeader() {
         }
         case "R": {
           e.preventDefault();
+          setHelpOpen(false);
           play("click");
           setSettingsOpen((prev) => !prev);
           break;
@@ -50,6 +51,7 @@ export function NavHeader() {
         case "S": {
           e.preventDefault();
           setHelpOpen(false);
+          play("click");
           shuffleRef.current?.click();
           break;
         }
