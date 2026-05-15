@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { ShuffleButton } from "@/components/shuffle-button";
 import { SoundToggle } from "@/components/sound-toggle";
 import { SettingsDrawer } from "@/components/settings-drawer";
+import { HelpSheet } from "@/components/help-sheet";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useSoundEnabled } from "@/components/sound-provider";
@@ -17,6 +18,7 @@ export function NavHeader() {
   const { muted, toggle: toggleSound, play } = useSoundEnabled();
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const shuffleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -47,7 +49,14 @@ export function NavHeader() {
         }
         case "S": {
           e.preventDefault();
+          setHelpOpen(false);
           shuffleRef.current?.click();
+          break;
+        }
+        case "?": {
+          e.preventDefault();
+          play("click");
+          setHelpOpen((prev) => !prev);
           break;
         }
       }
@@ -100,6 +109,15 @@ export function NavHeader() {
               <TooltipContent className="flex font-bold flex-col justify-center items-center">
                 Settings
                 <KbdGroup><Kbd>⇧</Kbd><Kbd>R</Kbd></KbdGroup>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger render={<span />}>
+                <HelpSheet externalOpen={helpOpen} onExternalOpenChange={setHelpOpen} />
+              </TooltipTrigger>
+              <TooltipContent className="flex font-bold flex-col justify-center items-center">
+                Help
+                <KbdGroup><Kbd>⇧</Kbd><Kbd>?</Kbd></KbdGroup>
               </TooltipContent>
             </Tooltip>
           </div>
