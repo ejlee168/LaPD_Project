@@ -110,7 +110,7 @@ export function CaseGrid({ games }: { games: Game[] }) {
       if (!filters.includes(category)) return false;
       if (!q) return true;
       const date = new Date(g.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toLowerCase();
-      return g.title.toLowerCase().includes(q) || g.author?.toLowerCase().includes(q) || date.includes(q);
+      return g.title.toLowerCase().includes(q) || g.author?.toLowerCase().includes(q) || date.includes(q) || g.category?.toLowerCase().includes(q);
     });
     const sorted = [...result];
     if (sort === "date") {
