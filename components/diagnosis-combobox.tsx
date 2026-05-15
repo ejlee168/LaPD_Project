@@ -15,8 +15,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { CATEGORY_META } from "@/lib/categories";
 import { toast } from "sonner";
 import type { Diagnosis } from "@/lib/types";
+
+interface Category {
+  id: number;
+  category: string;
+}
 
 interface DiagnosisComboboxProps {
   diagnoses: Diagnosis[];
@@ -37,6 +43,8 @@ export function DiagnosisCombobox({
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const userEditingRef = useRef(false);
@@ -111,8 +119,21 @@ export function DiagnosisCombobox({
 
   function handleCreateClick() {
     setOpen(false);
+    setSelectedCategoryId(null);
     setConfirmOpen(true);
   }
+
+  useEffect(() => {
+    if (!allowCreate || categories.length > 0) return;
+    const supabase = createClient();
+    supabase
+      .from("categories")
+      .select("id, category")
+      .order("id")
+      .then(({ data }) => {
+        if (data) setCategories(data as Category[]);
+      });
+  }, [allowCreate, categories.length]);
 
   function toTitleCase(str: string): string {
     const articles = new Set(["a", "an", "the", "of", "in", "on", "at", "to", "for", "with", "and", "but", "or", "nor", "vs", "aka"]);
@@ -133,13 +154,13 @@ export function DiagnosisCombobox({
 
   async function handleConfirmCreate() {
     const name = toTitleCase(query.trim());
-    if (!name) return;
+    if (!name || selectedCategoryId === null) return;
 
     setCreating(true);
     const supabase = createClient();
     const { data, error } = await supabase
       .from("diagnoses")
-      .insert({ name })
+      .insert({ name, category: selectedCategoryId })
       .select("id, name")
       .single();
 
@@ -354,9 +375,34 @@ export function DiagnosisCombobox({
               You&apos;re about to add <strong>&quot;{toTitleCase(query.trim())}&quot;</strong> as a new diagnosis. Please make sure it doesn&apos;t already exist under a different name or spelling.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Category</p>
+            <div className="flex flex-wrap gap-1.5">
+              {categories.map((c) => {
+                const meta = CATEGORY_META[c.category];
+                const active = selectedCategoryId === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setSelectedCategoryId(c.id)}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors",
+                      active
+                        ? cn(meta?.bg, "ring-2 ring-foreground/30")
+                        : "bg-muted hover:bg-muted/70 text-muted-foreground",
+                    )}
+                  >
+                    {meta && <span aria-hidden>{meta.emoji}</span>}
+                    <span>{c.category}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmCreate} disabled={creating}>
+            <AlertDialogAction onClick={handleConfirmCreate} disabled={creating || selectedCategoryId === null}>
               {creating ? "Creating..." : "Confirm"}
             </AlertDialogAction>
           </AlertDialogFooter>
