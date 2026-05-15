@@ -5,6 +5,7 @@ import { LuSettings } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useSoundEnabled } from "@/components/sound-provider";
 import { getHaptics } from "@/lib/haptics";
+import { cn } from "@/lib/utils";
 import {
   Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger,
 } from "@/components/ui/drawer";
@@ -18,6 +19,13 @@ import {
   setShuffleFilters,
   type ShuffleFilter,
 } from "@/lib/shuffle-filter";
+import {
+  ALL_SHUFFLE_CATEGORIES,
+  getShuffleCategories,
+  setShuffleCategories,
+} from "@/lib/shuffle-categories";
+import { CATEGORY_META } from "@/lib/categories";
+import { getShowCategories, setShowCategories } from "@/lib/show-categories";
 
 const ATTEMPTS_STORAGE_KEY = "lapd-attempts";
 
@@ -33,19 +41,37 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
   const open = externalOpen ?? internalOpen;
   const setOpen = onExternalOpenChange ?? setInternalOpen;
   const [filters, setFilters] = useState<ShuffleFilter[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [showCats, setShowCats] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
 
 
   useEffect(() => {
     setFilters(getShuffleFilters());
+    setCategories(getShuffleCategories());
+    setShowCats(getShowCategories());
     setHydrated(true);
   }, []);
+
+  function toggleShowCats() {
+    getHaptics().trigger("selection");
+    setShowCats((prev) => {
+      const next = !prev;
+      setShowCategories(next);
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (!hydrated) return;
     setShuffleFilters(filters);
   }, [filters, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    setShuffleCategories(categories);
+  }, [categories, hydrated]);
 
   function toggleFilter(f: ShuffleFilter) {
     getHaptics().trigger("selection");
@@ -55,6 +81,17 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
         return prev.filter((x) => x !== f);
       }
       return [...prev, f];
+    });
+  }
+
+  function toggleCategory(c: string) {
+    getHaptics().trigger("selection");
+    setCategories((prev) => {
+      if (prev.includes(c)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((x) => x !== c);
+      }
+      return [...prev, c];
     });
   }
 
@@ -79,10 +116,30 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
           <div className="max-w-4xl mx-auto overflow-y-auto px-4 py-6 space-y-8">
             <section className="space-y-3">
               <div>
-                <h2 className="text-base font-semibold">Shuffle</h2>
-                <p className="text-base text-muted-foreground">
+                <h2 className="text-base font-semibold">Display</h2>
+                {/* <p className="text-base text-muted-foreground">
+                  Show category badges on case cards and the play screen.
+                </p> */}
+              </div>
+              <div className="rounded-lg border p-4">
+                <label className="flex cursor-pointer items-center gap-3 text-base">
+                  <input
+                    type="checkbox"
+                    checked={showCats}
+                    onChange={toggleShowCats}
+                    className="h-4 w-4 cursor-pointer accent-foreground"
+                  />
+                  Show categories
+                </label>
+              </div>
+            </section>
+
+            <section className="space-y-3">
+              <div>
+                <h2 className="text-base font-semibold">Shuffle button</h2>
+                {/* <p className="text-base text-muted-foreground">
                   Which cases the Shuffle button pulls from.
-                </p>
+                </p> */}
               </div>
               <div className="space-y-2 rounded-lg border p-4">
                 {ALL_SHUFFLE_FILTERS.map((f) => {
@@ -108,10 +165,44 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
 
             <section className="space-y-3">
               <div>
+                <h2 className="text-base font-semibold">Shuffle categories</h2>
+                {/* <p className="text-base text-muted-foreground">
+                  Which categories the Shuffle button pulls from.
+                </p> */}
+              </div>
+              <div className="grid grid-cols-2 gap-2 rounded-lg border p-4">
+                {ALL_SHUFFLE_CATEGORIES.map((c) => {
+                  const isSelected = categories.includes(c);
+                  const isOnlySelected = categories.length === 1 && isSelected;
+                  const meta = CATEGORY_META[c];
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      aria-pressed={isSelected}
+                      disabled={isOnlySelected}
+                      onClick={() => toggleCategory(c)}
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed",
+                        isSelected
+                          ? cn(meta.bg, "border-transparent")
+                          : "border-border text-muted-foreground hover:bg-muted",
+                      )}
+                    >
+                      <span aria-hidden>{meta.emoji}</span>
+                      {c}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="space-y-3">
+              <div>
                 <h2 className="text-base font-semibold">Progress</h2>
-                <p className="text-base text-muted-foreground">
+                {/* <p className="text-base text-muted-foreground">
                   Clears all your case results. This cannot be undone.
-                </p>
+                </p> */}
               </div>
               <div className="rounded-lg border p-4">
                 <Button variant="destructive" onClick={() => { setOpen(false); setResetOpen(true); }}>

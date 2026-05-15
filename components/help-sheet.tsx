@@ -265,10 +265,23 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
             >
               <SubHeading>Shuffle filter</SubHeading>
               <Para>
-                Chooses which categories the <strong>Shuffle</strong> button pulls
-                from: Completed, Failed, and/or Unseen. The filter applies to both
-                the top-bar Shuffle button and the Random Puzzle button on the
-                end-of-game dialog. At least one category must stay selected.
+                Chooses which cases the <strong>Shuffle</strong> button pulls
+                from by attempt status: Completed, Failed, and/or Unseen. The
+                filter applies to both the top-bar Shuffle button and the
+                Random Puzzle button on the end-of-game dialog. At least one
+                option must stay selected.
+              </Para>
+              <SubHeading>Categories</SubHeading>
+              <Para>
+                Restricts Shuffle to specific medical categories (e.g.
+                Cardiovascular, Neurology). Uncategorized cases are always
+                eligible. At least one category must stay selected.
+              </Para>
+              <SubHeading>Show categories</SubHeading>
+              <Para>
+                Toggles whether category badges appear on case cards and the
+                play screen. The shuffle category filter still applies even
+                when badges are hidden.
               </Para>
               <SubHeading>Reset progress</SubHeading>
               <Para>

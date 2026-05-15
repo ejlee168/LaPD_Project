@@ -63,7 +63,7 @@ async function GameLoader({ id }: { id: string }) {
   const [gameResult, diagnoses] = await Promise.all([
     supabase
       .from("games")
-      .select("id, title, answer_id, clues, created_at, diagnoses(name)")
+      .select("id, title, answer_id, clues, created_at, diagnoses(name, categories(category))")
       .eq("id", id)
       .single(),
     getDiagnoses(),
@@ -75,10 +75,16 @@ async function GameLoader({ id }: { id: string }) {
 
   const data = gameResult.data;
 
-  const joinedDiagnosis = data.diagnoses as unknown as { name: string } | { name: string }[] | null;
-  const answerName = Array.isArray(joinedDiagnosis)
-    ? joinedDiagnosis[0]?.name ?? "Unknown"
-    : joinedDiagnosis?.name ?? "Unknown";
+  type JoinedDiagnosis = {
+    name: string;
+    categories: { category: string } | { category: string }[] | null;
+  };
+  const joinedDiagnosis = data.diagnoses as unknown as JoinedDiagnosis | JoinedDiagnosis[] | null;
+  const diag = Array.isArray(joinedDiagnosis) ? joinedDiagnosis[0] : joinedDiagnosis;
+  const answerName = diag?.name ?? "Unknown";
+  const cats = diag?.categories;
+  const cat = Array.isArray(cats) ? cats[0] : cats;
+  const category = cat?.category ?? null;
 
   const game: Game = {
     id: data.id,
@@ -88,7 +94,7 @@ async function GameLoader({ id }: { id: string }) {
     created_at: data.created_at,
   };
 
-  return <GameBoard game={game} diagnoses={diagnoses} answerName={answerName} />;
+  return <GameBoard game={game} diagnoses={diagnoses} answerName={answerName} category={category} />;
 }
 
 export default async function PlayPage({

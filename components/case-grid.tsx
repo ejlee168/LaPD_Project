@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { LuArrowUpDown, LuFilter } from "react-icons/lu";
+import { LuArrowUpDown, LuFilter, LuLayers } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CaseCard } from "@/components/case-card";
+import { CATEGORY_META } from "@/lib/categories";
+import { cn } from "@/lib/utils";
 import { getAllAttempts, type GameAttempt } from "@/lib/attempts";
 import {
   DropdownMenu,
@@ -21,6 +23,7 @@ interface Game {
   title: string;
   author: string | null;
   created_at: string;
+  category: string | null;
 }
 
 type Filter = "completed" | "failed" | "unseen";
@@ -38,10 +41,14 @@ function isSort(value: unknown): value is Sort {
   return value === "date" || value === "author";
 }
 
+const GROUP_KEY = "lapd-group-by-category";
+const CATEGORY_ORDER = Object.keys(CATEGORY_META);
+
 export function CaseGrid({ games }: { games: Game[] }) {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<Filter[]>(ALL_FILTERS);
   const [sort, setSort] = useState<Sort>("date");
+  const [groupByCategory, setGroupByCategory] = useState(false);
   const [attempts, setAttempts] = useState<Record<string, GameAttempt>>({});
   const [hydrated, setHydrated] = useState(false);
 
@@ -57,6 +64,8 @@ export function CaseGrid({ games }: { games: Game[] }) {
       }
       const rawSort = localStorage.getItem(SORT_KEY);
       if (rawSort && isSort(rawSort)) setSort(rawSort);
+      const rawGroup = localStorage.getItem(GROUP_KEY);
+      if (rawGroup === "true") setGroupByCategory(true);
     } catch {
       // ignore malformed storage
     }
@@ -73,6 +82,11 @@ export function CaseGrid({ games }: { games: Game[] }) {
     if (!hydrated) return;
     localStorage.setItem(SORT_KEY, sort);
   }, [sort, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(GROUP_KEY, String(groupByCategory));
+  }, [groupByCategory, hydrated]);
 
   function toggleFilter(f: Filter) {
     setFilters((prev) => {
@@ -166,23 +180,91 @@ export function CaseGrid({ games }: { games: Game[] }) {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Group cases by category"
+            aria-pressed={groupByCategory}
+            onClick={() => setGroupByCategory((v) => !v)}
+            className={cn(groupByCategory ? "text-foreground" : "text-muted-foreground")}
+          >
+            <LuLayers className="h-[1.2rem] w-[1.2rem]" />
+          </Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((game, index) => (
-          <CaseCard
-            key={game.id}
-            id={game.id}
-            title={game.title}
-            author={game.author}
-            createdAt={game.created_at}
-            index={index}
-          />
-        ))}
-      </div>
+      {groupByCategory ? (
+        <GroupedGrid games={filtered} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((game, index) => (
+            <CaseCard
+              key={game.id}
+              id={game.id}
+              title={game.title}
+              author={game.author}
+              createdAt={game.created_at}
+              category={game.category}
+              index={index}
+            />
+          ))}
+        </div>
+      )}
       {filtered.length === 0 && (
         <p className="text-center text-muted-foreground">No cases found. Be the first to create one!</p>
       )}
     </>
+  );
+}
+
+function GroupedGrid({ games }: { games: Game[] }) {
+  const groups = useMemo(() => {
+    const byCategory = new Map<string, Game[]>();
+    for (const g of games) {
+      const key = g.category ?? "Uncategorized";
+      const list = byCategory.get(key);
+      if (list) list.push(g);
+      else byCategory.set(key, [g]);
+    }
+    const ordered: { category: string; games: Game[] }[] = [];
+    for (const name of CATEGORY_ORDER) {
+      const list = byCategory.get(name);
+      if (list && list.length) ordered.push({ category: name, games: list });
+    }
+    const uncat = byCategory.get("Uncategorized");
+    if (uncat && uncat.length) ordered.push({ category: "Uncategorized", games: uncat });
+    return ordered;
+  }, [games]);
+
+  let runningIndex = 0;
+  return (
+    <div className="space-y-8">
+      {groups.map(({ category, games: groupGames }) => {
+        const meta = CATEGORY_META[category];
+        const start = runningIndex;
+        runningIndex += groupGames.length;
+        return (
+          <section key={category} className="space-y-3">
+            <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              {meta && <span aria-hidden>{meta.emoji}</span>}
+              <span>{category}</span>
+              <span className="text-xs font-normal opacity-60">{groupGames.length}</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {groupGames.map((game, i) => (
+                <CaseCard
+                  key={game.id}
+                  id={game.id}
+                  title={game.title}
+                  author={game.author}
+                  createdAt={game.created_at}
+                  category={game.category}
+                  index={start + i}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
   );
 }

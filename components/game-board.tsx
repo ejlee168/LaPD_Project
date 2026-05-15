@@ -20,11 +20,13 @@ import { motion } from "motion/react";
 import { ShuffleButton } from "@/components/shuffle-button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { CategoryBadge } from "@/components/category-badge";
 
 interface GameBoardProps {
   game: Game;
   diagnoses: Diagnosis[];
   answerName: string;
+  category?: string | null;
 }
 
 interface GuessEntry {
@@ -34,7 +36,7 @@ interface GuessEntry {
   clueNumber: number;
 }
 
-export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
+export function GameBoard({ game, diagnoses, answerName, category }: GameBoardProps) {
   const [revealedCount, setRevealedCount] = useState(1);
   const [selectedDiagnosis, setSelectedDiagnosis] = useState("");
   const [gameState, setGameState] = useState<"playing" | "won" | "lost">("playing");
@@ -125,8 +127,9 @@ export function GameBoard({ game, diagnoses, answerName }: GameBoardProps) {
 
   return (
     <div className="space-y-6">
-      <FadeIn className="text-center space-y-1">
+      <FadeIn className="relative text-center space-y-1">
         <h1 className="text-2xl font-bold">{game.title}</h1>
+        <CategoryBadge category={category} className="absolute right-0 top-1/2 -translate-y-1/2" />
       </FadeIn>
       <div className="space-y-3">
         {game.clues.map((clue, index) => (
