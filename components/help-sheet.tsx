@@ -1,8 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { FaQuestion } from "react-icons/fa6";
+import { FaCheck, FaQuestion, FaXmark } from "react-icons/fa6";
+import {
+  LuArrowUpDown,
+  LuCornerDownLeft,
+  LuEye,
+  LuFilter,
+  LuKeyboard,
+  LuLayers,
+  LuPlus,
+  LuRotateCcw,
+  LuSearch,
+  LuTags,
+  LuTrophy,
+} from "react-icons/lu";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import {
   Sheet,
@@ -12,6 +31,8 @@ import {
 } from "@/components/ui/sheet";
 import { useSoundEnabled } from "@/components/sound-provider";
 import { getHaptics } from "@/lib/haptics";
+import { CATEGORY_META } from "@/lib/categories";
+import { cn } from "@/lib/utils";
 
 interface HelpSheetProps {
   externalOpen?: boolean;
@@ -97,14 +118,14 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 Each card is a case you can play. Tap one to open it, or use the
                 controls above the grid to find something specific.
               </Para>
-              <SubHeading>Search</SubHeading>
+              <SubHeading icon={<LuSearch className="size-4" />}>Search</SubHeading>
               <Para>
                 The search box matches against case <strong>title</strong>,{" "}
                 <strong>author</strong>, and the <strong>created date</strong> (e.g.{" "}
                 <code className="rounded bg-muted px-1">Jan 5</code>). Matching is
                 case-insensitive.
               </Para>
-              <SubHeading>Filter</SubHeading>
+              <SubHeading icon={<LuFilter className="size-4" />}>Filter</SubHeading>
               <Para>
                 The funnel icon toggles which cases appear in the grid:
               </Para>
@@ -123,12 +144,42 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 Progress is stored locally in your browser, so it&apos;s tied to this
                 device.
               </Para>
-              <SubHeading>Sort</SubHeading>
+              <SubHeading icon={<LuArrowUpDown className="size-4" />}>Sort</SubHeading>
               <Para>
                 The arrows icon switches between sorting by <strong>Date</strong>{" "}
                 (newest first) and <strong>Author</strong> (alphabetical).
               </Para>
-              <SubHeading>Create</SubHeading>
+              <SubHeading icon={<LuTags className="size-4" />}>Category badges</SubHeading>
+              <Para>
+                Each case can be tagged with a medical category (e.g.{" "}
+                <em>Cardiovascular</em>, <em>Neurology</em>, <em>ENT</em>). When{" "}
+                <strong>Show categories</strong> is enabled in Settings, a small
+                colored anatomy icon appears on each card — a heart for
+                Cardiovascular, a brain for Neurology, and so on. The same badge
+                shows on the play screen. Cases without a category stay
+                unlabeled and are always eligible for Shuffle.
+              </Para>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2 rounded-md border p-3 sm:grid-cols-3">
+                {Object.entries(CATEGORY_META).map(([name, meta]) => (
+                  <div key={name} className="flex items-center gap-2 text-sm">
+                    <meta.Icon
+                      aria-hidden
+                      className={cn("size-4 shrink-0", meta.color)}
+                    />
+                    <span>{name}</span>
+                  </div>
+                ))}
+              </div>
+              <SubHeading icon={<LuLayers className="size-4" />}>Group by category</SubHeading>
+              <Para>
+                The stacked layers icon above the grid toggles between a flat
+                list and a view that groups cases under each medical category as
+                its own labeled section. Active categories highlight their icon;
+                each section header shows the category name and case count.
+                Uncategorized cases appear at the bottom. Search, filter, and
+                sort all still apply inside each group.
+              </Para>
+              <SubHeading icon={<LuPlus className="size-4" />}>Create</SubHeading>
               <Para>
                 The <strong>+ create a case</strong> button next to the search box
                 takes you to the case editor — see the <em>Creating a case</em>{" "}
@@ -145,7 +196,7 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 a time, and your job is to guess the diagnosis from as few clues as
                 possible.
               </Para>
-              <SubHeading>Reading clues</SubHeading>
+              <SubHeading icon={<LuEye className="size-4" />}>Reading clues</SubHeading>
               <Para>
                 Only the first clue is visible when the case loads. The remaining
                 clues are hidden behind{" "}
@@ -157,7 +208,7 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 to open the full-size view. Click anywhere on the dark backdrop to
                 close.
               </Para>
-              <SubHeading>Guessing</SubHeading>
+              <SubHeading icon={<LuKeyboard className="size-4" />}>Guessing</SubHeading>
               <Para>
                 Type into the diagnosis combobox to search the global list of
                 diagnoses. The combobox supports:
@@ -184,7 +235,7 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 no highlight, pressing <Shortcut keys={["↵"]} /> auto-selects the
                 only direct match if there is exactly one.
               </Para>
-              <SubHeading>Submitting and skipping</SubHeading>
+              <SubHeading icon={<LuCornerDownLeft className="size-4" />}>Submitting and skipping</SubHeading>
               <Row
                 label="Guess"
                 shortcut={<Shortcut keys={["↵"]} />}
@@ -199,7 +250,7 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 Diagnoses you&apos;ve already guessed wrong are crossed out in the
                 dropdown — you can&apos;t pick them again.
               </Para>
-              <SubHeading>End of game</SubHeading>
+              <SubHeading icon={<LuTrophy className="size-4" />}>End of game</SubHeading>
               <Para>
                 When you solve a case you get a confetti burst and the result is
                 saved as <em>completed</em>. Run out of clues and the case is saved
@@ -207,8 +258,29 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 you can review every clue and your guess history. From the result
                 dialog you can <strong>Admire Puzzle</strong>, jump{" "}
                 <strong>Back to Cases</strong>, or shuffle into a{" "}
-                <strong>Random Puzzle</strong>.
+                <strong>Random Puzzle</strong>, which follows the same shuffle rules as the <strong>Shuffle button</strong>.
               </Para>
+              <Para>
+                Back on the home grid, each card picks up a colored border and
+                status badge so you can see your results at a glance:
+              </Para>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ExampleCard
+                  result="won"
+                  title="Headache"
+                  author="dr-house"
+                  date="Jan 5, 2026"
+                  cluesUsed={3}
+                  category="Neurology"
+                />
+                <ExampleCard
+                  result="lost"
+                  title="Chest pain"
+                  author="grey"
+                  date="Feb 12, 2026"
+                  category="Cardiovascular"
+                />
+              </div>
             </Section>
 
             <Section
@@ -263,7 +335,13 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
               title="Settings"
               description="Opened with the gear icon or Shift+R."
             >
-              <SubHeading>Shuffle filter</SubHeading>
+              <SubHeading icon={<LuEye className="size-4" />}>Show categories</SubHeading>
+              <Para>
+                Toggles whether category badges appear on case cards and the
+                play screen. The shuffle category filter still applies even
+                when badges are hidden.
+              </Para>
+              <SubHeading icon={<LuFilter className="size-4" />}>Shuffle filter</SubHeading>
               <Para>
                 Chooses which cases the <strong>Shuffle</strong> button pulls
                 from by attempt status: Completed, Failed, and/or Unseen. The
@@ -271,19 +349,14 @@ export function HelpSheet({ externalOpen, onExternalOpenChange }: HelpSheetProps
                 Random Puzzle button on the end-of-game dialog. At least one
                 option must stay selected.
               </Para>
-              <SubHeading>Categories</SubHeading>
+              <SubHeading icon={<LuTags className="size-4" />}>Shuffle categories</SubHeading>
               <Para>
                 Restricts Shuffle to specific medical categories (e.g.
                 Cardiovascular, Neurology). Uncategorized cases are always
                 eligible. At least one category must stay selected.
               </Para>
-              <SubHeading>Show categories</SubHeading>
-              <Para>
-                Toggles whether category badges appear on case cards and the
-                play screen. The shuffle category filter still applies even
-                when badges are hidden.
-              </Para>
-              <SubHeading>Reset progress</SubHeading>
+
+              <SubHeading icon={<LuRotateCcw className="size-4" />}>Reset progress</SubHeading>
               <Para>
                 Clears every saved attempt from your browser&apos;s local storage.
                 After a reset, every case becomes <em>unseen</em> again. This cannot
@@ -319,10 +392,17 @@ function Section({
   );
 }
 
-function SubHeading({ children }: { children: React.ReactNode }) {
+function SubHeading({
+  icon,
+  children,
+}: {
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <h3 className="pt-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-      {children}
+    <h3 className="flex items-center gap-2 pt-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      {icon}
+      <span>{children}</span>
     </h3>
   );
 }
@@ -366,5 +446,67 @@ function Shortcut({ keys }: { keys: string[] }) {
         <Kbd key={i}>{k}</Kbd>
       ))}
     </KbdGroup>
+  );
+}
+
+function ExampleCard({
+  result,
+  title,
+  author,
+  date,
+  cluesUsed,
+  category,
+}: {
+  result: "won" | "lost";
+  title: string;
+  author?: string;
+  date: string;
+  cluesUsed?: number;
+  category?: string;
+}) {
+  const won = result === "won";
+  const meta = category ? CATEGORY_META[category] : undefined;
+  return (
+    <Card
+      className={cn(
+        "relative",
+        won
+          ? "border-green-500/50 bg-green-500/5"
+          : "border-red-500/50 bg-red-500/5",
+      )}
+    >
+      <div
+        className={cn(
+          "absolute right-2 top-2 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+          won
+            ? "bg-green-500/10 text-green-600 dark:text-green-400"
+            : "bg-red-500/10 text-red-600 dark:text-red-400",
+        )}
+      >
+        {won ? (
+          <FaCheck className="h-3 w-3" />
+        ) : (
+          <FaXmark className="h-3 w-3" />
+        )}
+        {won && cluesUsed != null && (
+          <span>
+            {cluesUsed} clue{cluesUsed !== 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
+      {meta && (
+        <meta.Icon
+          aria-hidden
+          className={cn("absolute bottom-2 right-2 size-4 shrink-0", meta.color)}
+        />
+      )}
+      <CardHeader className="pr-12">
+        <CardTitle className="text-base">{title}</CardTitle>
+        <CardDescription>
+          {date}
+          {author && ` | ${author}`}
+        </CardDescription>
+      </CardHeader>
+    </Card>
   );
 }
