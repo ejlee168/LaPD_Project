@@ -184,7 +184,7 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
                       disabled={isOnlySelected}
                       onClick={() => toggleCategory(c)}
                       className={cn(
-                        "inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed",
+                        "cursor-pointer inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed",
                         isSelected
                           ? "border-transparent bg-muted text-foreground"
                           : "border-border text-muted-foreground hover:bg-muted/50",
