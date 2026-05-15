@@ -17,16 +17,10 @@ export function CategoryBadge({ category, className }: CategoryBadgeProps) {
   if (!meta) return null;
 
   return (
-    <span
+    <meta.Icon
       title={category}
       aria-label={category}
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-md px-1.5 py-0.5 text-sm leading-none",
-        meta.bg,
-        className,
-      )}
-    >
-      <span aria-hidden>{meta.emoji}</span>
-    </span>
+      className={cn("size-4 shrink-0", meta.color, className)}
+    />
   );
 }

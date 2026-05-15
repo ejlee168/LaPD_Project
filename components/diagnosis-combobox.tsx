@@ -387,13 +387,18 @@ export function DiagnosisCombobox({
                     type="button"
                     onClick={() => setSelectedCategoryId(c.id)}
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors",
+                      "inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs transition-colors",
                       active
-                        ? cn(meta?.bg, "ring-2 ring-foreground/30")
-                        : "bg-muted hover:bg-muted/70 text-muted-foreground",
+                        ? "text-foreground ring-2 ring-foreground/30"
+                        : "text-muted-foreground hover:bg-muted/70",
                     )}
                   >
-                    {meta && <span aria-hidden>{meta.emoji}</span>}
+                    {meta && (
+                      <meta.Icon
+                        aria-hidden
+                        className={cn("size-3.5", active ? meta.color : "opacity-60")}
+                      />
+                    )}
                     <span>{c.category}</span>
                   </button>
                 );

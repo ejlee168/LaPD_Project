@@ -1,21 +1,69 @@
+import type { IconType } from "react-icons";
+import {
+  GiBandageRoll,
+  GiBiceps,
+  GiBrain,
+  GiBrainstorm,
+  GiSyringe,
+  GiDrop,
+  GiEmbryo,
+  GiEyeball,
+  GiHeartOrgan,
+  GiHumanEar,
+  GiKidneys,
+  GiLungs,
+  GiStethoscope,
+  GiStomach,
+} from "react-icons/gi";
+
 export interface CategoryMeta {
-  emoji: string;
-  bg: string;
+  Icon: IconType;
+  color: string;
 }
 
 export const CATEGORY_META: Record<string, CategoryMeta> = {
-  Dermatology: { emoji: "🩹", bg: "bg-pink-100 dark:bg-pink-950/40" },
-  Endocrinology: { emoji: "🍬", bg: "bg-amber-100 dark:bg-amber-950/40" },
-  Gastrointestinal: { emoji: "🍽️", bg: "bg-orange-100 dark:bg-orange-950/40" },
-  "General Med": { emoji: "🩺", bg: "bg-slate-100 dark:bg-slate-800/50" },
-  Haematology: { emoji: "🩸", bg: "bg-red-100 dark:bg-red-950/40" },
-  Respiratory: { emoji: "🫁", bg: "bg-sky-100 dark:bg-sky-950/40" },
-  Cardiovascular: { emoji: "🫀", bg: "bg-rose-100 dark:bg-rose-950/40" },
-  Musculoskeletal: { emoji: "🦴", bg: "bg-stone-100 dark:bg-stone-800/50" },
-  Reproductive: { emoji: "🤰", bg: "bg-fuchsia-100 dark:bg-fuchsia-950/40" },
-  Neurology: { emoji: "🧠", bg: "bg-purple-100 dark:bg-purple-950/40" },
-  Nephrology: { emoji: "🫘", bg: "bg-violet-100 dark:bg-violet-950/40" },
-  Ophthalmology: { emoji: "👁️", bg: "bg-cyan-100 dark:bg-cyan-950/40" },
-  ENT: { emoji: "👂", bg: "bg-yellow-100 dark:bg-yellow-950/40" },
-  Psychiatry: { emoji: "💭", bg: "bg-indigo-100 dark:bg-indigo-950/40" },
+  Dermatology: {
+    Icon: GiBandageRoll,
+    color: "text-orange-400 dark:text-orange-200",
+  },
+  Endocrinology: {
+    Icon: GiSyringe,
+    color: "text-lime-800 dark:text-lime-400",
+  },
+  Gastrointestinal: {
+    Icon: GiStomach,
+    color: "text-orange-500 dark:text-orange-400",
+  },
+  "General Med": {
+    Icon: GiStethoscope,
+    color: "text-slate-500 dark:text-slate-400",
+  },
+  Haematology: { Icon: GiDrop, color: "text-red-500 dark:text-red-400" },
+  Respiratory: { Icon: GiLungs, color: "text-pink-500 dark:text-pink-400" },
+  Cardiovascular: {
+    Icon: GiHeartOrgan,
+    color: "text-rose-500 dark:text-rose-400",
+  },
+  Musculoskeletal: {
+    Icon: GiBiceps,
+    color: "text-gray-700 dark:text-white",
+  },
+  Reproductive: {
+    Icon: GiEmbryo,
+    color: "text-fuchsia-500 dark:text-fuchsia-400",
+  },
+  Neurology: { Icon: GiBrain, color: "text-rose-400 dark:text-rose-400" },
+  Nephrology: {
+    Icon: GiKidneys,
+    color: "text-rose-500 dark:text-rose-400",
+  },
+  Ophthalmology: {
+    Icon: GiEyeball,
+    color: "text-white bg-black rounded-full",
+  },
+  ENT: { Icon: GiHumanEar, color: "text-yellow-500 dark:text-yellow-400" },
+  Psychiatry: {
+    Icon: GiBrainstorm,
+    color: "text-indigo-500 dark:text-indigo-400",
+  },
 };

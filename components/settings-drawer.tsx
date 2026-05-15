@@ -56,12 +56,13 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
 
   function toggleShowCats() {
     getHaptics().trigger("selection");
-    setShowCats((prev) => {
-      const next = !prev;
-      setShowCategories(next);
-      return next;
-    });
+    setShowCats((prev) => !prev);
   }
+
+  useEffect(() => {
+    if (!hydrated) return;
+    setShowCategories(showCats);
+  }, [showCats, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -185,11 +186,14 @@ export function SettingsDrawer({ externalOpen, onExternalOpenChange }: { externa
                       className={cn(
                         "inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed",
                         isSelected
-                          ? cn(meta.bg, "border-transparent")
-                          : "border-border text-muted-foreground hover:bg-muted",
+                          ? "border-transparent bg-muted text-foreground"
+                          : "border-border text-muted-foreground hover:bg-muted/50",
                       )}
                     >
-                      <span aria-hidden>{meta.emoji}</span>
+                      <meta.Icon
+                        aria-hidden
+                        className={cn("size-4", isSelected ? meta.color : "opacity-60")}
+                      />
                       {c}
                     </button>
                   );

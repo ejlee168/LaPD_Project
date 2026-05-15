@@ -245,7 +245,7 @@ function GroupedGrid({ games }: { games: Game[] }) {
         return (
           <section key={category} className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-              {meta && <span aria-hidden>{meta.emoji}</span>}
+              {meta && <meta.Icon aria-hidden className={cn("size-4", meta.color)} />}
               <span>{category}</span>
               <span className="text-xs font-normal opacity-60">{groupGames.length}</span>
             </h2>
