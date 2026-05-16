@@ -53,7 +53,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     color: "text-fuchsia-500 dark:text-fuchsia-400",
   },
   Neurology: { Icon: GiBrain, color: "text-rose-400 dark:text-rose-400" },
-  Nephrology: {
+  Renal: {
     Icon: GiKidneys,
     color: "text-rose-500 dark:text-rose-400",
   },
